@@ -1,0 +1,17 @@
+MAX DIFFERENCE 0.00019730409496737655 FLAGS MATCH True
+dlc fixed200 1650.0 0.029276149228826823 0.02936019807531302 -8.404884648619687e-05
+step fixed200 1650.0 0.007603725544334593 0.007627160448530167 -2.3434904195574445e-05
+sine fixed200 1650.0 0.0034038434659688943 0.003400256681571001 3.586784397893294e-06
+slalom fixed200 1650.0 0.2224449163640451 0.22264222045901247 -0.00019730409496737655
+{
+  "batch_vs_scalar_cases": 14,
+  "maximum_metric_difference": 0.00019730409496737655,
+  "batch_scalar_strict_1e6_match": false,
+  "teacher_roundoff_metric_tolerance_m": 0.0005,
+  "completion_parity": true,
+  "feature_transform_rank": 4,
+  "transform_roundtrip_error": 1.2234187842796729e-06,
+  "deployed_network_steps_without_offline_teacher": 100,
+  "features": 11,
+  "scope": "Verifies same plant/queue and existing information. No analytic teacher is deployed as LANS."
+}

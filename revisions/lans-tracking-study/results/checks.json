@@ -1,0 +1,12 @@
+{
+  "batch_vs_scalar_cases": 14,
+  "maximum_metric_difference": 0.00019730409496737655,
+  "batch_scalar_strict_1e6_match": false,
+  "teacher_roundoff_metric_tolerance_m": 0.0005,
+  "completion_parity": true,
+  "feature_transform_rank": 4,
+  "transform_roundtrip_error": 1.2234187842796729e-06,
+  "deployed_network_steps_without_offline_teacher": 100,
+  "features": 11,
+  "scope": "Verifies same plant/queue and existing information. No analytic teacher is deployed as LANS."
+}

@@ -1,0 +1,26 @@
+{
+  "status": "passed",
+  "network_PPO_runs": 12,
+  "BC_policy_snapshots": 6,
+  "total_PPO_steps": 1204224,
+  "offline_corpus_rows": 384000,
+  "final_scalar_episodes": 3080,
+  "unrestricted_LANS_validation_completions": 74,
+  "BC_LANS_validation_completions": 84,
+  "validation_cases_each": 84,
+  "final_reference_solver_failures": 0,
+  "teacher_metric_roundoff_m": 0.00019730409496737655,
+  "teacher_is_not_deployed": true,
+  "checks": [
+    "all seeds retained",
+    "no extra input or hidden layer",
+    "frozen-hidden/output-projection weights verified",
+    "baseline selected on validation only",
+    "test after checkpoint freeze",
+    "3080 raw metrics independently recomputed",
+    "physical steering bound retained",
+    "failed unrestricted trial retained",
+    "corrected MPC solved without reference solver errors"
+  ],
+  "limits": "No universal dominance,additional PPO-learning benefit,physical safety or global stability certification is implied."
+}

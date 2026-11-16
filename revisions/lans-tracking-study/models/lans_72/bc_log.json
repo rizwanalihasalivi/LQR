@@ -1,0 +1,50 @@
+[
+  {
+    "step": 0,
+    "physical_steering_mse": 0.0035597935784608126
+  },
+  {
+    "step": 500,
+    "physical_steering_mse": 8.650308154756203e-05
+  },
+  {
+    "step": 1000,
+    "physical_steering_mse": 6.449698412325233e-05
+  },
+  {
+    "step": 1500,
+    "physical_steering_mse": 5.067602978670038e-05
+  },
+  {
+    "step": 2000,
+    "physical_steering_mse": 2.9743510822299868e-05
+  },
+  {
+    "step": 2500,
+    "physical_steering_mse": 3.772628406295553e-05
+  },
+  {
+    "step": 3000,
+    "physical_steering_mse": 1.8930410078610294e-05
+  },
+  {
+    "step": 3500,
+    "physical_steering_mse": 1.4393530364031903e-05
+  },
+  {
+    "step": 4000,
+    "physical_steering_mse": 1.0800687959999777e-05
+  },
+  {
+    "step": 4500,
+    "physical_steering_mse": 1.0439081961521879e-05
+  },
+  {
+    "step": 5000,
+    "physical_steering_mse": 7.175022346928017e-06
+  },
+  {
+    "step": 5500,
+    "physical_steering_mse": 7.078003363858443e-06
+  }
+]

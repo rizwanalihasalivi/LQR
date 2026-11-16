@@ -1,0 +1,6 @@
+{
+  "reason": "L-BFGS-B reported547 constrained-solve failures in the objective-matched reference. Original results retained; do not count solver failure as LANS superiority.",
+  "correction": "Use fixed-Hessian OSQP with physical bounds,eps_abs/rel1e-8,50000iterations,polishing; learned controllers remain frozen.",
+  "cost_changed": false,
+  "LANS_changed": false
+}

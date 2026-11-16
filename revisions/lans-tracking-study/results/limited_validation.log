@@ -1,0 +1,7 @@
+DONE validation limited_lans 72
+DONE validation limited_lans 73
+DONE validation limited_lans 74
+DONE validation limited_ppo 72
+DONE validation limited_ppo 73
+DONE validation limited_ppo 74
+SELECTED PPO BASELINE limited_ppo {'limited_ppo': {'completion': np.float64(1.0), 'rmse': np.float64(0.027847998281678107)}, 'rl_ppo': {'completion': np.float64(0.8809523809523809), 'rmse': np.float64(0.35451616539888514)}, 'original_ppo': {'completion': np.float64(0.7142857142857143), 'rmse': np.float64(0.706795784515475)}}

@@ -1,0 +1,13 @@
+{
+  "reason": "Unrestricted fine-tuning regressed from84/84 to74/84 LANS validation completions. Do not discard those outcomes.",
+  "change": "Keep the same six BC checkpoints; freeze actor hidden layers and logstd; project output-layer parameters within1e-5 physical-action scaled distance of BC weights before every rollout and after learning.",
+  "stage": "validation-driven corrective trial before final test",
+  "primary_lans": "limited_lans",
+  "all_seeds": [
+    72,
+    73,
+    74
+  ],
+  "PPO_reference_selection": "Select strongest whole PPO reference among limited_ppo,rl_ppo,original_ppo on validation completion then mean penalized RMSE.",
+  "time": 1794850599.080628
+}

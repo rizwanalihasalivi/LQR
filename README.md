@@ -5,6 +5,19 @@ It retains the LQR–PPO residual framework and uses the dynamic bicycle model, 
 
 ## New experimental improvements
 
+The newest [precision/tracking study](revisions/lans-tracking-study/Tracking_Report.md) retains the deployed LQR–PPO topology, dynamic bicycle model and 11 observation channels, with explicit model-informed offline pretraining, feature conditioning and projected output-layer PPO fine-tuning.
+
+On fresh cases, its final LANS policies complete **420/420 episodes** and rank first by mean error in **14/14 conditions against the original three baselines**. The equally pretrained PPO comparison gives LANS first in **9/14**, and the objective-matched MPC comparison gives **5/14**. LANS has the lowest average condition rank in each declared four-controller pool, but universal or statistically established every-scenario superiority is not proved. BC-only policies remain strong, so a distinct additional PPO-learning benefit must not be inferred from these rankings.
+
+- [Newest report](revisions/lans-tracking-study/Tracking_Report.md) · [PDF](revisions/lans-tracking-study/Tracking_Report.pdf) · [Word](revisions/lans-tracking-study/Tracking_Report.docx)
+- [Original-baseline ranks](revisions/lans-tracking-study/results/rank_original.csv)
+- [Equally pretrained PPO ranks](revisions/lans-tracking-study/results/rank_equal_pretraining.csv)
+- [Objective-matched MPC ranks](revisions/lans-tracking-study/results/rank_objective_matched.csv)
+- [All cases, confidence intervals and completions](revisions/lans-tracking-study/results/summary.csv)
+- [Execution/integrity audit](revisions/lans-tracking-study/results/audit.json)
+
+The earlier studies below remain unchanged as development history and are not the newest results.
+
 The [tuned fallback study](revisions/lans-robust-fallback/README.md) keeps the same vehicle model, controller blocks and 11 policy inputs. It changes LQR Q/R, training and actor initialization. On matched fresh cases, LANS completes the 200 ms DLC, step and sine tests; the 200 ms slalom test still fails. High-delay improvement comes from the retuned LQR fallback, not learned runtime suppression.
 
 Against the original stronger PPO, original fast LQR and declared MPC, new LANS ranks first in 3 of 14 conditions and third by average condition rank. Its aggregate failure-penalized RMSE is lower than the earlier LANS, while some nominal errors are worse. The target of first place in every scenario is **not established**.

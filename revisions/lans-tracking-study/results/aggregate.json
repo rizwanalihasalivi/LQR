@@ -1,0 +1,52 @@
+{
+  "limited_lans": {
+    "completed": 420,
+    "episodes": 420,
+    "mean_rmse": 0.02473524083203685
+  },
+  "limited_ppo": {
+    "completed": 420,
+    "episodes": 420,
+    "mean_rmse": 0.025082970226862063
+  },
+  "bc_lans": {
+    "completed": 420,
+    "episodes": 420,
+    "mean_rmse": 0.024844872370880882
+  },
+  "bc_ppo": {
+    "completed": 420,
+    "episodes": 420,
+    "mean_rmse": 0.025197463956590362
+  },
+  "original_ppo": {
+    "completed": 300,
+    "episodes": 420,
+    "mean_rmse": 0.7053892138511233
+  },
+  "previous_lans": {
+    "completed": 390,
+    "episodes": 420,
+    "mean_rmse": 0.25467262383643424
+  },
+  "robust_lqr": {
+    "completed": 130,
+    "episodes": 140,
+    "mean_rmse": 0.47038636544259405
+  },
+  "fast_lqr": {
+    "completed": 100,
+    "episodes": 140,
+    "mean_rmse": 0.7276493616187126
+  },
+  "mpc": {
+    "completed": 130,
+    "episodes": 140,
+    "mean_rmse": 0.28792878482366674
+  },
+  "matched_mpc": {
+    "completed": 60,
+    "episodes": 140,
+    "mean_rmse": 1.2803170489261382
+  }
+}

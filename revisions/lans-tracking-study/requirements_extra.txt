@@ -1,0 +1,3 @@
+# In addition to the sibling dynamic-bicycle requirements snapshot.
+osqp==1.1.3
+joblib==1.6.0

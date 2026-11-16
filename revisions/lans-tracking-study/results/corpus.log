@@ -1,0 +1,16 @@
+{
+  "rows": 384000,
+  "rollout_cases": 384,
+  "teacher_completed": 384,
+  "seed": 88000,
+  "teacher_parameters": {
+    "kp": 100.0,
+    "kd": 20.0,
+    "decay": 40.0,
+    "proxy": 1.0,
+    "fourth": 1.0
+  },
+  "case_mean_penalized_rmse": 0.03218486125006562,
+  "perturbation": "Gaussian0.35 on four normalized current-state features; teacher target recomputed from the same11 causal features",
+  "scope": "Offline training corpus only; no final-test data."
+}

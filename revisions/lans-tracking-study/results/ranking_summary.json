@@ -1,0 +1,120 @@
+{
+  "original": {
+    "limited_lans": {
+      "mean_rank": 1.0,
+      "first_conditions": 14,
+      "conditions": 14
+    },
+    "original_ppo": {
+      "mean_rank": 2.7142857142857144,
+      "first_conditions": 0,
+      "conditions": 14
+    },
+    "fast_lqr": {
+      "mean_rank": 3.9285714285714284,
+      "first_conditions": 0,
+      "conditions": 14
+    },
+    "mpc": {
+      "mean_rank": 2.357142857142857,
+      "first_conditions": 0,
+      "conditions": 14
+    }
+  },
+  "equal_pretraining": {
+    "limited_lans": {
+      "mean_rank": 1.3571428571428572,
+      "first_conditions": 9,
+      "conditions": 14
+    },
+    "limited_ppo": {
+      "mean_rank": 1.6428571428571428,
+      "first_conditions": 5,
+      "conditions": 14
+    },
+    "fast_lqr": {
+      "mean_rank": 4.0,
+      "first_conditions": 0,
+      "conditions": 14
+    },
+    "mpc": {
+      "mean_rank": 3.0,
+      "first_conditions": 0,
+      "conditions": 14
+    }
+  },
+  "objective_matched": {
+    "limited_lans": {
+      "mean_rank": 1.7857142857142858,
+      "first_conditions": 5,
+      "conditions": 14
+    },
+    "limited_ppo": {
+      "mean_rank": 2.0714285714285716,
+      "first_conditions": 3,
+      "conditions": 14
+    },
+    "fast_lqr": {
+      "mean_rank": 3.4285714285714284,
+      "first_conditions": 0,
+      "conditions": 14
+    },
+    "matched_mpc": {
+      "mean_rank": 2.7142857142857144,
+      "first_conditions": 6,
+      "conditions": 14
+    }
+  },
+  "all_references": {
+    "limited_lans": {
+      "mean_rank": 2.7142857142857144,
+      "first_conditions": 5,
+      "conditions": 14
+    },
+    "limited_ppo": {
+      "mean_rank": 3.2142857142857144,
+      "first_conditions": 0,
+      "conditions": 14
+    },
+    "bc_lans": {
+      "mean_rank": 2.7142857142857144,
+      "first_conditions": 0,
+      "conditions": 14
+    },
+    "bc_ppo": {
+      "mean_rank": 3.0714285714285716,
+      "first_conditions": 3,
+      "conditions": 14
+    },
+    "original_ppo": {
+      "mean_rank": 6.785714285714286,
+      "first_conditions": 0,
+      "conditions": 14
+    },
+    "previous_lans": {
+      "mean_rank": 7.571428571428571,
+      "first_conditions": 0,
+      "conditions": 14
+    },
+    "robust_lqr": {
+      "mean_rank": 8.428571428571429,
+      "first_conditions": 0,
+      "conditions": 14
+    },
+    "fast_lqr": {
+      "mean_rank": 7.928571428571429,
+      "first_conditions": 0,
+      "conditions": 14
+    },
+    "mpc": {
+      "mean_rank": 6.214285714285714,
+      "first_conditions": 0,
+      "conditions": 14
+    },
+    "matched_mpc": {
+      "mean_rank": 6.071428571428571,
+      "first_conditions": 6,
+      "conditions": 14
+    }
+  }
+}

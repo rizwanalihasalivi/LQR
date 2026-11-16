@@ -1,0 +1,12 @@
+START lans 72
+START lans 73
+START lans 74
+DONE lans 73
+START ppo 73
+DONE lans 72
+START ppo 72
+DONE lans 74
+START ppo 74
+DONE ppo 72
+DONE ppo 73
+DONE ppo 74

@@ -1,0 +1,9 @@
+from pathlib import Path
+import json,hashlib
+ROOT=Path(__file__).resolve().parents[1]
+P=dict(scope='Offline supervised pretraining plus actual PPO fine-tuning of same11-input64x64 policy; analytic teacher is NOT deployed.',preserved=['same dynamic bicycle matrices/parameters','100Hz full-command FIFO plant','LQR+PPO residual+exponential gain+saturation','same11 channels through invertible linear conditioning','no extra queue/state/history input and no deployed predictor/planner'],parameters=dict(lqr_gain_source='lans-robust-fallback/results/robust_gain.json',beta_decay=.002,threshold_ms=5.,lans_residual_scale=1.,ppo_scale=.5,actuator_bound=.5),teacher_search=dict(validation_seeds=[22000,22001],source='teacher_search.json',selected_before_network_training=True),training=dict(policy_seeds=[72,73,74],corpus_seed=88000,BC_updates=6000,batch_size=512,BC_learning_rate=.0003,PPO_steps=100352,PPO_learning_rate=.00001,PPO_epochs=10,entropy=0.,reward='-1000ey_next^2-.01heading_next^2-.001command^2-.01delta_command^2;failure penalty250'),selection='Primary results use every final PPO-trained checkpoint. BC checkpoints are ablations, never silently relabelled PPO. No best-seed or per-scenario selection.',test=dict(seeds=[26000,26001,26002,26003,26004],scales=[[.88,1.04],[1.12,.96]],families=['dlc','step','sine','slalom'],conditions=14),baselines='Equal teacher corpus/pretraining/architecture/PPO budget for newly trained PPO; also preserve original stronger PPO, original fast LQR, matched robust LQR and declared MPC. No optimal-MPC or universal superiority claim.',guard='All existing scenario outcomes are development evidence. This new test runs after all six policies finish and is not used for retuning.')
+if __name__=='__main__':
+ path=ROOT/'results/protocol.json'
+ if path.exists():assert json.loads(path.read_text())==P
+ else:path.write_text(json.dumps(P,indent=2))
+ print(hashlib.sha256(path.read_bytes()).hexdigest())

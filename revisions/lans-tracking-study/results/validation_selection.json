@@ -1,0 +1,20 @@
+{
+  "primary_lans": "limited_lans",
+  "ppo_reference": "limited_ppo",
+  "scores": {
+    "limited_ppo": {
+      "completion": 1.0,
+      "rmse": 0.027847998281678107
+    },
+    "rl_ppo": {
+      "completion": 0.8809523809523809,
+      "rmse": 0.35451616539888514
+    },
+    "original_ppo": {
+      "completion": 0.7142857142857143,
+      "rmse": 0.706795784515475
+    }
+  },
+  "rule": "One whole PPO reference selected on validation only, never per final-test case. LANS primary always final PPO-trained model; BC only ablation.",
+  "time": 1794850803.0014408
+}

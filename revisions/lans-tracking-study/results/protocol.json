@@ -1,0 +1,71 @@
+{
+  "scope": "Offline supervised pretraining plus actual PPO fine-tuning of same11-input64x64 policy; analytic teacher is NOT deployed.",
+  "preserved": [
+    "same dynamic bicycle matrices/parameters",
+    "100Hz full-command FIFO plant",
+    "LQR+PPO residual+exponential gain+saturation",
+    "same11 channels through invertible linear conditioning",
+    "no extra queue/state/history input and no deployed predictor/planner"
+  ],
+  "parameters": {
+    "lqr_gain_source": "lans-robust-fallback/results/robust_gain.json",
+    "beta_decay": 0.002,
+    "threshold_ms": 5.0,
+    "lans_residual_scale": 1.0,
+    "ppo_scale": 0.5,
+    "actuator_bound": 0.5
+  },
+  "teacher_search": {
+    "validation_seeds": [
+      22000,
+      22001
+    ],
+    "source": "teacher_search.json",
+    "selected_before_network_training": true
+  },
+  "training": {
+    "policy_seeds": [
+      72,
+      73,
+      74
+    ],
+    "corpus_seed": 88000,
+    "BC_updates": 6000,
+    "batch_size": 512,
+    "BC_learning_rate": 0.0003,
+    "PPO_steps": 100352,
+    "PPO_learning_rate": 1e-05,
+    "PPO_epochs": 10,
+    "entropy": 0.0,
+    "reward": "-1000ey_next^2-.01heading_next^2-.001command^2-.01delta_command^2;failure penalty250"
+  },
+  "selection": "Primary results use every final PPO-trained checkpoint. BC checkpoints are ablations, never silently relabelled PPO. No best-seed or per-scenario selection.",
+  "test": {
+    "seeds": [
+      26000,
+      26001,
+      26002,
+      26003,
+      26004
+    ],
+    "scales": [
+      [
+        0.88,
+        1.04
+      ],
+      [
+        1.12,
+        0.96
+      ]
+    ],
+    "families": [
+      "dlc",
+      "step",
+      "sine",
+      "slalom"
+    ],
+    "conditions": 14
+  },
+  "baselines": "Equal teacher corpus/pretraining/architecture/PPO budget for newly trained PPO; also preserve original stronger PPO, original fast LQR, matched robust LQR and declared MPC. No optimal-MPC or universal superiority claim.",
+  "guard": "All existing scenario outcomes are development evidence. This new test runs after all six policies finish and is not used for retuning."
+}
