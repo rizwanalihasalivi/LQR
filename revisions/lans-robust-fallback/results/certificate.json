@@ -1,0 +1,179 @@
+{
+  "gain": [
+    0.04891199256347719,
+    0.008851975882951653,
+    0.5801081788131277,
+    0.07680900463480077
+  ],
+  "cases": [
+    {
+      "delay_steps": 0,
+      "delay_ms": 0,
+      "spectral_radius": 0.9780688461830546,
+      "lyapunov_residual": 2.842170943040401e-14,
+      "minimum_P_eigenvalue": 3.974545729816395,
+      "unsaturated_invariant_c": 1871.7084927319722
+    },
+    {
+      "delay_steps": 1,
+      "delay_ms": 10,
+      "spectral_radius": 0.977594428565287,
+      "lyapunov_residual": 9.094947017729282e-13,
+      "minimum_P_eigenvalue": 1.001744006658098,
+      "unsaturated_invariant_c": 237.48484052815613
+    },
+    {
+      "delay_steps": 2,
+      "delay_ms": 20,
+      "spectral_radius": 0.9770824743690184,
+      "lyapunov_residual": 9.094947017729282e-13,
+      "minimum_P_eigenvalue": 1.0029032070264585,
+      "unsaturated_invariant_c": 204.92700871744577
+    },
+    {
+      "delay_steps": 3,
+      "delay_ms": 30,
+      "spectral_radius": 0.9765300023003821,
+      "lyapunov_residual": 9.094947017729282e-13,
+      "minimum_P_eigenvalue": 1.0039556592514465,
+      "unsaturated_invariant_c": 193.30485356862062
+    },
+    {
+      "delay_steps": 4,
+      "delay_ms": 40,
+      "spectral_radius": 0.9759353503940801,
+      "lyapunov_residual": 1.1368683772161603e-13,
+      "minimum_P_eigenvalue": 1.0049693572236293,
+      "unsaturated_invariant_c": 185.8187630420422
+    },
+    {
+      "delay_steps": 5,
+      "delay_ms": 50,
+      "spectral_radius": 0.9753000537855743,
+      "lyapunov_residual": 1.616484723854228e-13,
+      "minimum_P_eigenvalue": 1.0059670088999106,
+      "unsaturated_invariant_c": 179.71993368805755
+    },
+    {
+      "delay_steps": 6,
+      "delay_ms": 60,
+      "spectral_radius": 0.9746325258545991,
+      "lyapunov_residual": 3.8198777474462986e-11,
+      "minimum_P_eigenvalue": 1.0069595238611548,
+      "unsaturated_invariant_c": 174.40771332471647
+    },
+    {
+      "delay_steps": 7,
+      "delay_ms": 70,
+      "spectral_radius": 0.9739549600292077,
+      "lyapunov_residual": 1.4551915228366852e-11,
+      "minimum_P_eigenvalue": 1.007952630736312,
+      "unsaturated_invariant_c": 169.87920179794952
+    },
+    {
+      "delay_steps": 8,
+      "delay_ms": 80,
+      "spectral_radius": 0.9733154175356119,
+      "lyapunov_residual": 1.404032445861958e-11,
+      "minimum_P_eigenvalue": 1.0089480812417975,
+      "unsaturated_invariant_c": 166.3742313709312
+    },
+    {
+      "delay_steps": 9,
+      "delay_ms": 90,
+      "spectral_radius": 0.9728069792970002,
+      "lyapunov_residual": 2.1827872842550278e-11,
+      "minimum_P_eigenvalue": 1.0099432922577847,
+      "unsaturated_invariant_c": 164.23550564841798
+    },
+    {
+      "delay_steps": 10,
+      "delay_ms": 100,
+      "spectral_radius": 0.9725940465335873,
+      "lyapunov_residual": 5.093170329928398e-11,
+      "minimum_P_eigenvalue": 1.0109310325317402,
+      "unsaturated_invariant_c": 163.80120565452077
+    },
+    {
+      "delay_steps": 11,
+      "delay_ms": 110,
+      "spectral_radius": 0.9729353532213663,
+      "lyapunov_residual": 5.638867150992155e-11,
+      "minimum_P_eigenvalue": 1.0119004735411419,
+      "unsaturated_invariant_c": 165.2927480058239
+    },
+    {
+      "delay_steps": 12,
+      "delay_ms": 120,
+      "spectral_radius": 0.9741380348307676,
+      "lyapunov_residual": 5.820766091346741e-11,
+      "minimum_P_eigenvalue": 1.0128402170632729,
+      "unsaturated_invariant_c": 168.70965501458696
+    },
+    {
+      "delay_steps": 13,
+      "delay_ms": 130,
+      "spectral_radius": 0.9763179293986396,
+      "lyapunov_residual": 4.888534022029489e-11,
+      "minimum_P_eigenvalue": 1.0137422987674112,
+      "unsaturated_invariant_c": 173.76829609608748
+    },
+    {
+      "delay_steps": 14,
+      "delay_ms": 140,
+      "spectral_radius": 0.9791867728379161,
+      "lyapunov_residual": 3.467448550509289e-11,
+      "minimum_P_eigenvalue": 1.014604934389907,
+      "unsaturated_invariant_c": 179.92212778861605
+    },
+    {
+      "delay_steps": 15,
+      "delay_ms": 150,
+      "spectral_radius": 0.98229478633666,
+      "lyapunov_residual": 2.9103830456733704e-11,
+      "minimum_P_eigenvalue": 1.0154325086739178,
+      "unsaturated_invariant_c": 186.4723227802514
+    },
+    {
+      "delay_steps": 16,
+      "delay_ms": 160,
+      "spectral_radius": 0.9853321959509341,
+      "lyapunov_residual": 8.003553375601768e-11,
+      "minimum_P_eigenvalue": 1.0162333412798148,
+      "unsaturated_invariant_c": 192.73196019880686
+    },
+    {
+      "delay_steps": 17,
+      "delay_ms": 170,
+      "spectral_radius": 0.9881562893424745,
+      "lyapunov_residual": 1.0186340659856796e-10,
+      "minimum_P_eigenvalue": 1.0170169217490788,
+      "unsaturated_invariant_c": 198.1762468648525
+    },
+    {
+      "delay_steps": 18,
+      "delay_ms": 180,
+      "spectral_radius": 0.9907209652436935,
+      "lyapunov_residual": 5.582023732131347e-11,
+      "minimum_P_eigenvalue": 1.0177918825601466,
+      "unsaturated_invariant_c": 202.52117697176794
+    },
+    {
+      "delay_steps": 19,
+      "delay_ms": 190,
+      "spectral_radius": 0.9930247450201591,
+      "lyapunov_residual": 5.275069270282984e-11,
+      "minimum_P_eigenvalue": 1.0185650185271653,
+      "unsaturated_invariant_c": 205.71601305904827
+    },
+    {
+      "delay_steps": 20,
+      "delay_ms": 200,
+      "spectral_radius": 0.9950844464880232,
+      "lyapunov_residual": 1.1118572729174048e-10,
+      "minimum_P_eigenvalue": 1.0193410898588986,
+      "unsaturated_invariant_c": 207.87706369234667
+    }
+  ],
+  "scope": "Local nominal linear fallback, fixed integer delay0..200ms, zero reference forcing and no PPO residual. Each delay has its own augmented-state Lyapunov certificate. This is not a common certificate for varying delay, not global saturated stability and not guaranteed tracking of forced slalom references."
+}

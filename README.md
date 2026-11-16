@@ -1,7 +1,23 @@
 # LQR / LANS research materials
 
-The latest revision is in [revisions/dynamic-bicycle](revisions/dynamic-bicycle/README.md).
-It retains the LQR–PPO residual framework and uses the dynamic bicycle model, with explicitly documented stiffness-sign and sampled-LQR corrections.
+The initial manuscript revision is in [revisions/dynamic-bicycle](revisions/dynamic-bicycle/README.md).
+It retains the LQR–PPO residual framework and uses the dynamic bicycle model, with explicitly documented stiffness-sign and sampled-LQR corrections. Newer experimental studies are listed below; the original revised manuscript has not been silently overwritten with their results.
+
+## New experimental improvements
+
+The [tuned fallback study](revisions/lans-robust-fallback/README.md) keeps the same vehicle model, controller blocks and 11 policy inputs. It changes LQR Q/R, training and actor initialization. On matched fresh cases, LANS completes the 200 ms DLC, step and sine tests; the 200 ms slalom test still fails. High-delay improvement comes from the retuned LQR fallback, not learned runtime suppression.
+
+Against the original stronger PPO, original fast LQR and declared MPC, new LANS ranks first in 3 of 14 conditions and third by average condition rank. Its aggregate failure-penalized RMSE is lower than the earlier LANS, while some nominal errors are worse. The target of first place in every scenario is **not established**.
+
+A retained no-learning-prior ablation has slightly lower aggregate penalized RMSE than trained LANS (0.2519 m versus 0.2556 m). A consistent additional benefit from PPO training is therefore not demonstrated; parameter/initialization gains must not be relabelled as learned superiority.
+
+- [Full measured report](revisions/lans-robust-fallback/Robust_Fallback_Report.md) · [PDF](revisions/lans-robust-fallback/Robust_Fallback_Report.pdf) · [Word](revisions/lans-robust-fallback/Robust_Fallback_Report.docx)
+- [Ranks against original stronger baselines](revisions/lans-robust-fallback/results/final_rankings_against_original_baselines.csv)
+- [Matched original/new results](revisions/lans-robust-fallback/results/legacy_reference/matched_summary.csv)
+- [Fixed-delay local certificates and their limits](revisions/lans-robust-fallback/results/certificate.json)
+- [Preceding parameter-only study, including negative results](revisions/lans-improvement/Improvement_Report.md)
+
+The two new studies retain all 18 final trained policies, all failures and raw traces. No queue/history features, observer, predictor or additional controller branch was added to LANS.
 
 ## Revised paper and reviewer response
 

@@ -1,0 +1,1 @@
+{"candidate": "tolerant", "seed": 54, "actual_steps": 200704, "seconds": 138.4234573841095, "configuration": {"kind": "lans", "residual_scale": 0.5, "beta_decay": 0.002, "log_std": -4.0}}

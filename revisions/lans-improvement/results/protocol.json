@@ -1,0 +1,69 @@
+{
+  "goal": "Improve LANS honestly; no rank-one guarantee or post-hoc outcome selection.",
+  "baseline_revision": "dynamic-bicycle",
+  "fixed": [
+    "signed physical dynamic bicycle equations",
+    "magnitude parameters m1650 Iz4224 lf1.2 lr1.4 Cf/Cr80000",
+    "100Hz exact ZOH",
+    "full fused command FIFO delay",
+    "LQR+PPO+piecewise exponential gain+saturation",
+    "actor/critic 64x64 ReLU,11 causal features"
+  ],
+  "allowed_changes": [
+    "invertible observation scaling",
+    "explicit reward weights",
+    "residual scale",
+    "exponential gain decay parameter",
+    "training coverage and exploration initialization"
+  ],
+  "training_seeds": [
+    52,
+    53,
+    54
+  ],
+  "training_steps_per_policy": 200704,
+  "candidates": {
+    "precision": {
+      "kind": "lans",
+      "residual_scale": 0.02,
+      "beta_decay": 0.8,
+      "log_std": -3.0
+    },
+    "tolerant": {
+      "kind": "lans",
+      "residual_scale": 0.5,
+      "beta_decay": 0.002,
+      "log_std": -4.0
+    },
+    "ppo_standard": {
+      "kind": "ppo",
+      "residual_scale": 0.5,
+      "beta_decay": 0.8,
+      "log_std": -3.0
+    },
+    "ppo_conservative": {
+      "kind": "ppo",
+      "residual_scale": 0.5,
+      "beta_decay": 0.8,
+      "log_std": -4.0
+    }
+  },
+  "validation_seeds": [
+    8000,
+    8001
+  ],
+  "test_seeds": [
+    12000,
+    12001,
+    12002,
+    12003,
+    12004
+  ],
+  "selection": "Within each controller family, select one whole configuration across all three training seeds by mean validation completion fraction, then mean penalized RMSE; no per-scenario or best-seed switching. Test is executed once after selection file exists.",
+  "training": "Four known reference families with randomized amplitude/time scale and mass; delay curriculum uses 0ms first25%, 0/10ms next25%, and0/10/20/50/100/200ms plus mixed last50%.",
+  "validation": "All four nominal reference families, none/mixed/fixed200, nominal mass plus DLC1100/2200; same plant/actuator/queue/reference information for every method.",
+  "test": "Fresh physical seeds and held-out reference amplitude/time scaling factors(.9,1.1). Reference families were included in training, so no unseen-family generalization claim.",
+  "baselines": "LQR and MPC retain previous fixed gains/horizon; PPO receives same feature transformation,reward,curriculum,seed/step budget and two configuration trials. Any comparison with LQR/MPC is explicitly against those settings, not all possible tuned baselines.",
+  "metrics": "Completion and failure-penalized RMSE from previous campaign. Family selection uses all seeds; final rankings of means are not universal dominance claims.",
+  "integrity": "Original results,manuscript and checkpoints are not overwritten."
+}

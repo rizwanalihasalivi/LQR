@@ -1,0 +1,12 @@
+{
+  "candidate": "ppo_conservative",
+  "seed": 54,
+  "actual_steps": 200704,
+  "seconds": 145.7044861316681,
+  "configuration": {
+    "kind": "ppo",
+    "residual_scale": 0.5,
+    "beta_decay": 0.8,
+    "log_std": -4.0
+  }
+}

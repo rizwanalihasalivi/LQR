@@ -1,0 +1,18 @@
+{
+  "python": "3.12.14",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "packages": {
+    "torch": "2.14.1+cpu",
+    "numpy": "2.3.5",
+    "scipy": "1.17.0",
+    "gymnasium": "1.4.0",
+    "stable-baselines3": "2.9.0"
+  },
+  "original_baseline_commit": "f9f8ea939a9caab52f21a5ed809ca9b30486bfae",
+  "original_source_hashes": {
+    "dynamic_env.py": "07d3de1c20c02d80c5241eec66116538d89996920286fe62a74fe66711fd35f2",
+    "model_audit.py": "1bb8a746292aa4787dc2e6bca6413685ffebfeeac317fc7fe4059be4a5ced6fb",
+    "mpc.py": "cccbaa7c6ecfc2cbc5c6405b0276d628c24291e1aa9ca3a99f63f6c9292b181b"
+  },
+  "scope": "Timing/energy superiority is not evaluated in this improvement campaign."
+}

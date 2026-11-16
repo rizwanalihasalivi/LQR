@@ -1,0 +1,22 @@
+{
+  "status": "passed",
+  "trained_policies": 6,
+  "training_steps": 1204224,
+  "final_test_episodes": 1260,
+  "original_checkpoint_reference_episodes": 840,
+  "no_learning_reference_episodes": 140,
+  "tuning_candidates": 33,
+  "tuning_episode_evaluations": 432,
+  "fixed_delay_lyapunov_cases": 21,
+  "checks": [
+    "frozen plan",
+    "all seeds/final checkpoints",
+    "validation-only gain choice recomputed",
+    "all test traces later than sealed start",
+    "all primary and legacy metrics recomputed",
+    "same physical actuation bounds",
+    "LANS equals robust fallback at fixed200",
+    "zero MPC solver failures"
+  ],
+  "scope": "Consistency and finite campaign evidence, not every-scenario superiority, full hybrid stability or physical safety."
+}

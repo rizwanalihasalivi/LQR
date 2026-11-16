@@ -1,0 +1,18 @@
+{
+  "kind": "lans",
+  "seed": 64,
+  "actual_steps": 200704,
+  "seconds": 141.72605228424072,
+  "initialization": "exact fast-LQR prior encoded in existing ReLU actor; same initial total deterministic control for both families; no extra deployed block",
+  "initialization_test_commands": [
+    -0.03509705490546825,
+    0.03509705490546825
+  ],
+  "robust_gain": [
+    0.04891199256347719,
+    0.008851975882951653,
+    0.5801081788131277,
+    0.07680900463480077
+  ],
+  "source": "same physical dynamics and11 observations as preceding study"
+}

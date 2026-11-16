@@ -1,0 +1,52 @@
+{
+  "supplementary_episodes": 840,
+  "four_controller_mean_ranks_with_original_baselines": {
+    "new_lans": 3.0714285714285716,
+    "legacy_ppo": 1.8571428571428572,
+    "fast_lqr": 3.357142857142857,
+    "mpc": 1.7142857142857142
+  },
+  "first_conditions_with_original_baselines": {
+    "new_lans": 3,
+    "legacy_ppo": 7,
+    "fast_lqr": 0,
+    "mpc": 4
+  },
+  "aggregate_scores": {
+    "new_lans": {
+      "mean_rmse": 0.2556364369677579,
+      "completed": 390,
+      "episodes": 420
+    },
+    "legacy_lans": {
+      "mean_rmse": 0.7374544259388875,
+      "completed": 300,
+      "episodes": 420
+    },
+    "legacy_ppo": {
+      "mean_rmse": 0.7053149788264893,
+      "completed": 300,
+      "episodes": 420
+    },
+    "new_ppo": {
+      "mean_rmse": 0.8381062014801387,
+      "completed": 277,
+      "episodes": 420
+    },
+    "fast_lqr": {
+      "mean_rmse": 0.7319211178518884,
+      "completed": 100,
+      "episodes": 140
+    },
+    "robust_lqr": {
+      "mean_rmse": 0.4720795139550215,
+      "completed": 130,
+      "episodes": 140
+    },
+    "mpc": {
+      "mean_rmse": 0.28891122894067484,
+      "completed": 130,
+      "episodes": 140
+    }
+  }
+}

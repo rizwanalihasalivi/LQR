@@ -1,0 +1,7 @@
+{
+  "episodes": 140,
+  "completed": 130,
+  "mean_prior_rmse": 0.2519033684012626,
+  "mean_trained_rmse": 0.2556364369677579,
+  "scope": "Post-hoc ablation on existing test cases, never used for model selection. Exposes whether PPO training improves on the encoded linear prior; not an additional tuned controller."
+}

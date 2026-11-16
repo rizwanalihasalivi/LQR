@@ -1,0 +1,29 @@
+{
+  "policy_observations_identical": true,
+  "feature_count": 11,
+  "pending_commands_per_case": 20,
+  "pending_steering_values": [
+    0.05,
+    -0.05
+  ],
+  "predicted_state_at20ticks": [
+    [
+      0.05934777911108246,
+      0.601489367805163,
+      0.026743693497341854,
+      0.22104345703165101
+    ],
+    [
+      -0.10307499193953645,
+      -1.0694566665016325,
+      -0.040592531805303894,
+      -0.35369060513514483
+    ]
+  ],
+  "nominal_corrective_targets_at20ticks": [
+    -0.5,
+    0.5
+  ],
+  "interpretation": "Distinct pending queues are aliased by the current 11 observations, even though future plant states and corrective decisions differ. This demonstrates partial observability; it is not a proof that LANS cannot win a particular finite benchmark, and is not used to tune final test.",
+  "scope": "Constructed diagnostic histories; not claimed to be observed benchmark trajectories or a new deployed predictor."
+}

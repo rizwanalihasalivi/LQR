@@ -1,0 +1,12 @@
+{
+  "candidate": "precision",
+  "seed": 53,
+  "actual_steps": 200704,
+  "seconds": 139.62062001228333,
+  "configuration": {
+    "kind": "lans",
+    "residual_scale": 0.02,
+    "beta_decay": 0.8,
+    "log_std": -3.0
+  }
+}

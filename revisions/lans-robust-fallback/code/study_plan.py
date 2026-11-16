@@ -1,0 +1,9 @@
+from pathlib import Path
+import json,hashlib
+ROOT=Path(__file__).resolve().parents[1]
+PLAN=dict(purpose='Test a delay-robust LQR fallback within the unchanged LQR+PPO+gain architecture, after previous parameter-only study failed.',preserved=['same signed dynamic bicycle plant and vehicle magnitudes','100Hz full-command FIFO delay','original11 input channels','two64-unit ReLU layers','LQR plus bounded scalar PPO residual','original exponential beta threshold5ms/decay0.8ms^-1','actuator clipping±0.5rad'],changed=['LQR Q/R tuned only on validation with fixed-delay linear stability eligibility','actor initialization to known fast-LQR prior using existing ReLU units, with same initial total decision for PPO baseline','LANS residual scale0.2rad; PPO scale0.5rad','same explicit reward and randomized training as preceding study'],training_seeds=[62,63,64],steps_per_policy=200704,trained_families=['lans','ppo'],validation_seeds=[8000,8001],test_seeds=[18000,18001,18002,18003,18004],test_reference_scales=[[.9,1.05],[1.1,.95]],test_conditions='four known reference families x three delay regimes plus two DLC mass perturbations=14; fresh parameters/seeds; not unseen-family zero-shot.',selection='LQR fallback gain chosen before all new training using validation only. All three final PPO checkpoints reported; no best-seed choice or per-scenario switching. Test runs after all training.',baselines='Include both the matched robust LQR fallback and the original fast LQR; unchanged declared MPC20 and equal-budget/equal-prior trained PPO. No superiority over optimally tuned MPC is claimed.',hypothesis='Robust fallback can improve delay completion; low-delay PPO may recover tracking precision. Every-scenario rank1 is a target, not a promised conclusion.')
+if __name__=='__main__':
+ p=ROOT/'results/plan.json'
+ if p.exists():assert json.loads(p.read_text())==PLAN
+ else:p.write_text(json.dumps(PLAN,indent=2))
+ print(hashlib.sha256(p.read_bytes()).hexdigest())

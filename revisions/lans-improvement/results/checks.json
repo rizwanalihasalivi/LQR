@@ -1,0 +1,8 @@
+{
+  "unchanged_plant_zero_residual_none": 1000,
+  "unchanged_plant_zero_residual_mixed": 1000,
+  "unchanged_plant_zero_residual_fixed200": 128,
+  "original_fixed200_extreme_actions_identical_steps": 128,
+  "preview_transform_reconstruction_error": 5.895271892181198e-10,
+  "policy_feature_count": 11
+}

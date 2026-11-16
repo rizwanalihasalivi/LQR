@@ -1,0 +1,39 @@
+DONE validation precision 54
+DONE validation precision 52
+DONE validation precision 53
+DONE validation tolerant 53
+DONE validation tolerant 52
+DONE validation tolerant 54
+DONE validation ppo_standard 53
+DONE validation ppo_standard 52
+DONE validation ppo_standard 54
+DONE validation ppo_conservative 54
+DONE validation ppo_conservative 53
+DONE validation ppo_conservative 52
+DONE validation lqr -1
+DONE validation mpc -1
+{
+  "lans": "precision",
+  "ppo": "ppo_standard",
+  "validation_scores": {
+    "precision": {
+      "completion": 0.7142857142857143,
+      "mean_penalized_rmse": 0.7424786071396622
+    },
+    "tolerant": {
+      "completion": 0.7142857142857143,
+      "mean_penalized_rmse": 0.7430790913124239
+    },
+    "ppo_standard": {
+      "completion": 0.6666666666666666,
+      "mean_penalized_rmse": 0.8221978010729958
+    },
+    "ppo_conservative": {
+      "completion": 0.2619047619047619,
+      "mean_penalized_rmse": 1.6931049546352912
+    }
+  },
+  "selection_rule": "Within each controller family, select one whole configuration across all three training seeds by mean validation completion fraction, then mean penalized RMSE; no per-scenario or best-seed switching. Test is executed once after selection file exists.",
+  "protocol_sha256": "3e02bc0d46c845cbbc0c6f5eff788e02026297ee542a17c72f772050e23e2a9b",
+  "selected_at_unix": 1794847571.691244
+}

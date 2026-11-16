@@ -1,0 +1,7 @@
+{
+  "reward": "-100*(ey_next**2+4*heading_error_next**2)-.01*command**2-.1*(command-previous_command)**2; failure adds -250; no exogenous latency-reward term",
+  "observation": "11 dimensions: x/[.1,.5,.05,.2], speed/25, four original preview errors with duplicate current error/heading removed and divided by10*horizon^2, previous delay/200 and causal last10 mean/200",
+  "training_randomization": "four known path families; amplitude uniform[.8,1.2]; time scale uniform[.85,1.15]; mass uniform[1100,2200]; gain always fixed nominal LQR",
+  "ppo": "n_steps1024,batch64,epochs10,lr3e-4,gamma.99,GAE.95,clip.2,entropy.0001,vf.5,64x64ReLU; log_std and scalar residual scale as frozen per candidate",
+  "provenance": "Implementation details transcribed from executed source; no changes to training or selection rule."
+}

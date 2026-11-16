@@ -1,0 +1,46 @@
+[
+  {
+    "candidate": "precision",
+    "reference_policy": "ppo_standard",
+    "steps": 62275,
+    "outside_admissible_actions": 58812,
+    "fraction": 0.9443918105178644,
+    "by_delay": {
+      "mixed": {
+        "outside": 21355,
+        "total": 22418
+      },
+      "fixed200": {
+        "outside": 5206,
+        "total": 5409
+      },
+      "none": {
+        "outside": 32251,
+        "total": 34448
+      }
+    },
+    "scope": "Computed on validation PPO trajectories. This diagnoses bounded residual authority, not proof that no alternative LANS trajectory could improve tracking. It is not used to change selection or tune final test."
+  },
+  {
+    "candidate": "tolerant",
+    "reference_policy": "ppo_standard",
+    "steps": 62275,
+    "outside_admissible_actions": 9137,
+    "fraction": 0.14672019269369732,
+    "by_delay": {
+      "mixed": {
+        "outside": 2929,
+        "total": 22418
+      },
+      "fixed200": {
+        "outside": 3407,
+        "total": 5409
+      },
+      "none": {
+        "outside": 2801,
+        "total": 34448
+      }
+    },
+    "scope": "Computed on validation PPO trajectories. This diagnoses bounded residual authority, not proof that no alternative LANS trajectory could improve tracking. It is not used to change selection or tune final test."
+  }
+]

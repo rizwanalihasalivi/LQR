@@ -1,0 +1,25 @@
+100.0 1.0 1.0 40000.0 None None 1.009003999252614
+100.0 1.0 1.0 400000.0 0.75 0.7975852906457005 0.9902565693122793
+100.0 1.0 1.0 4000000.0 0.75 1.0556879974723563 0.9912490987325042
+100.0 1.0 100.0 40000.0 None None 1.0090197406367307
+100.0 1.0 100.0 400000.0 0.75 0.7986901940424369 0.9902637552928757
+100.0 1.0 100.0 4000000.0 0.75 1.0555811063214393 0.9912466073732469
+100.0 100.0 1.0 40000.0 None None 1.0088683992287175
+100.0 100.0 1.0 400000.0 0.75 0.7977806745846605 0.9902505936353164
+100.0 100.0 1.0 4000000.0 0.75 1.0554584151746196 0.9912540611948975
+100.0 100.0 100.0 40000.0 None None 1.0088850291494833
+100.0 100.0 100.0 400000.0 0.75 0.7976170349122538 0.9902578008033611
+100.0 100.0 100.0 4000000.0 0.75 1.0553516038444177 0.9912515730043007
+1000.0 1.0 1.0 40000.0 None None 1.0303562967238595
+1000.0 1.0 1.0 400000.0 None None 1.0052165308607388
+1000.0 1.0 1.0 4000000.0 0.75 0.8853762271034507 0.9968481777437591
+1000.0 1.0 100.0 40000.0 None None 1.0303598882609988
+1000.0 1.0 100.0 400000.0 None None 1.0052183617617236
+1000.0 1.0 100.0 4000000.0 0.75 0.8853495606602723 0.996848425905177
+1000.0 100.0 1.0 40000.0 None None 1.030416036704504
+1000.0 100.0 1.0 400000.0 None None 1.0051924438852804
+1000.0 100.0 1.0 4000000.0 0.75 0.8852582405413236 0.9968481544966838
+1000.0 100.0 100.0 40000.0 None None 1.0304196463761117
+1000.0 100.0 100.0 400000.0 None None 1.0051942874460338
+1000.0 100.0 100.0 4000000.0 0.75 0.885231585679438 0.9968484026671204
+CHOSEN {'heading_weight': 100.0, 'R': 40000.0, 'Q': [[100.0, 0.0, 0.0, 0.0], [0.0, 4.0, 0.0, 0.0], [0.0, 0.0, 100.0, 0.0], [0.0, 0.0, 0.0, 1.0]], 'K': [0.04891199256347719, 0.008851975882951653, 0.5801081788131277, 0.07680900463480077], 'maximum_fixed_delay_radius': 0.9950844464880232, 'eligible': True, 'completion': 0.9166666666666666, 'mean_penalized_rmse': 0.5218872496277669, 'validation_rows': [{'path': 'dlc', 'delay': 'none', 'seed': 8000, 'completed': True, 'penalized_rmse': 0.18732778031482294}, {'path': 'dlc', 'delay': 'none', 'seed': 8001, 'completed': True, 'penalized_rmse': 0.18650682634753943}, {'path': 'dlc', 'delay': 'mixed', 'seed': 8000, 'completed': True, 'penalized_rmse': 0.19384704236983497}, {'path': 'dlc', 'delay': 'mixed', 'seed': 8001, 'completed': True, 'penalized_rmse': 0.19482648280174156}, {'path': 'dlc', 'delay': 'fixed200', 'seed': 8000, 'completed': True, 'penalized_rmse': 0.24323075003248454}, {'path': 'dlc', 'delay': 'fixed200', 'seed': 8001, 'completed': True, 'penalized_rmse': 0.24316088049142212}, {'path': 'step', 'delay': 'none', 'seed': 8000, 'completed': True, 'penalized_rmse': 0.0974852440011383}, {'path': 'step', 'delay': 'none', 'seed': 8001, 'completed': True, 'penalized_rmse': 0.09546279110313796}, {'path': 'step', 'delay': 'mixed', 'seed': 8000, 'completed': True, 'penalized_rmse': 0.09645883775517586}, {'path': 'step', 'delay': 'mixed', 'seed': 8001, 'completed': True, 'penalized_rmse': 0.09952641263218365}, {'path': 'step', 'delay': 'fixed200', 'seed': 8000, 'completed': True, 'penalized_rmse': 0.10905921893203713}, {'path': 'step', 'delay': 'fixed200', 'seed': 8001, 'completed': True, 'penalized_rmse': 0.10775456114385827}, {'path': 'sine', 'delay': 'none', 'seed': 8000, 'completed': True, 'penalized_rmse': 0.11173419881286363}, {'path': 'sine', 'delay': 'none', 'seed': 8001, 'completed': True, 'penalized_rmse': 0.10976350106537797}, {'path': 'sine', 'delay': 'mixed', 'seed': 8000, 'completed': True, 'penalized_rmse': 0.11164153607777276}, {'path': 'sine', 'delay': 'mixed', 'seed': 8001, 'completed': True, 'penalized_rmse': 0.10984344232077829}, {'path': 'sine', 'delay': 'fixed200', 'seed': 8000, 'completed': True, 'penalized_rmse': 0.11163156907250049}, {'path': 'sine', 'delay': 'fixed200', 'seed': 8001, 'completed': True, 'penalized_rmse': 0.11034271847806797}, {'path': 'slalom', 'delay': 'none', 'seed': 8000, 'completed': True, 'penalized_rmse': 1.2414289868698476}, {'path': 'slalom', 'delay': 'none', 'seed': 8001, 'completed': True, 'penalized_rmse': 1.2410942833163503}, {'path': 'slalom', 'delay': 'mixed', 'seed': 8000, 'completed': True, 'penalized_rmse': 1.330990676589011}, {'path': 'slalom', 'delay': 'mixed', 'seed': 8001, 'completed': True, 'penalized_rmse': 1.3393520180827476}, {'path': 'slalom', 'delay': 'fixed200', 'seed': 8000, 'completed': False, 'penalized_rmse': 2.431128368483961}, {'path': 'slalom', 'delay': 'fixed200', 'seed': 8001, 'completed': False, 'penalized_rmse': 2.4216958639717507}]}
