@@ -1,0 +1,76 @@
+DONE EVALUATION 42
+DONE EVALUATION 44
+DONE EVALUATION 43
+episodes 1225 summary rows 101 paired rows 72
+[
+  {
+    "kind": "lqr",
+    "samples": 3000,
+    "mean_us": 32.907667333333336,
+    "median_us": 27.421,
+    "p95_us": 58.25359999999975,
+    "p99_us": 139.12040999999974,
+    "max_us": 1491.0,
+    "mean_reciprocal_hz": 30388.05485270798
+  },
+  {
+    "kind": "full",
+    "samples": 3000,
+    "mean_us": 204.0506946666667,
+    "median_us": 175.14800000000002,
+    "p95_us": 341.36699999999996,
+    "p99_us": 512.8616299999981,
+    "max_us": 1712.112,
+    "mean_reciprocal_hz": 4900.742933679206
+  },
+  {
+    "kind": "no_reward",
+    "samples": 3000,
+    "mean_us": 211.30189133333334,
+    "median_us": 177.812,
+    "p95_us": 334.9991499999994,
+    "p99_us": 560.6967799999987,
+    "max_us": 4599.701,
+    "mean_reciprocal_hz": 4732.565305922786
+  },
+  {
+    "kind": "no_gain",
+    "samples": 3000,
+    "mean_us": 206.02835166666665,
+    "median_us": 173.9565,
+    "p95_us": 339.10199999999986,
+    "p99_us": 569.9402399999994,
+    "max_us": 2771.584,
+    "mean_reciprocal_hz": 4853.700919851557
+  },
+  {
+    "kind": "no_lqr",
+    "samples": 3000,
+    "mean_us": 210.42120066666666,
+    "median_us": 175.8745,
+    "p95_us": 350.5180999999997,
+    "p99_us": 595.0843299999979,
+    "max_us": 3540.159,
+    "mean_reciprocal_hz": 4752.372844712184
+  },
+  {
+    "kind": "ppo",
+    "samples": 3000,
+    "mean_us": 205.64463899999996,
+    "median_us": 175.228,
+    "p95_us": 334.11154999999985,
+    "p99_us": 527.5386799999956,
+    "max_us": 3401.982,
+    "mean_reciprocal_hz": 4862.757448298958
+  },
+  {
+    "kind": "mpc",
+    "samples": 3000,
+    "mean_us": 152.922652,
+    "median_us": 133.5005,
+    "p95_us": 241.60749999999987,
+    "p99_us": 380.35056999999904,
+    "max_us": 2211.182,
+    "mean_reciprocal_hz": 6539.2535829158915
+  }
+]

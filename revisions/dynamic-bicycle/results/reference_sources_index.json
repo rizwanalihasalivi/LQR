@@ -1,0 +1,43 @@
+[
+  {
+    "reference": 1,
+    "title": "Proximal Policy Optimization Algorithms",
+    "verified_fields": [
+      "title",
+      "lead author Schulman",
+      "year 2017",
+      "arXiv1707.06347"
+    ],
+    "url": "https://raw.githubusercontent.com/openai/spinningup/master/docs/algorithms/ppo.rst",
+    "snapshot": "reference_source_1.txt"
+  },
+  {
+    "reference": 2,
+    "title": "Residual Reinforcement Learning for Robot Control",
+    "verified_fields": [
+      "title",
+      "author list",
+      "arXiv1812.03201"
+    ],
+    "url": "https://raw.githubusercontent.com/residualrl/residualrl.github.io/master/index.html",
+    "snapshot": "reference_residual_rl.txt"
+  },
+  {
+    "reference": 3,
+    "title": "Stable-Baselines3: Reliable Reinforcement Learning Implementations",
+    "verified_fields": [
+      "official complete BibTeX citation"
+    ],
+    "url": "https://raw.githubusercontent.com/DLR-RM/stable-baselines3/master/README.md",
+    "snapshot": "reference_sb3.txt"
+  },
+  {
+    "reference": 4,
+    "title": "SciPy 1.0: Fundamental Algorithms for Scientific Computing in Python",
+    "verified_fields": [
+      "official complete BibTeX citation and DOI"
+    ],
+    "url": "https://raw.githubusercontent.com/scipy/scipy/main/CITATION.bib",
+    "snapshot": "reference_scipy.txt"
+  }
+]

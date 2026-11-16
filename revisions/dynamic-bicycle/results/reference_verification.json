@@ -1,0 +1,18 @@
+[
+  {
+    "url": "https://api.crossref.org/works/10.1109/ICRA.2019.8794127",
+    "error": "<urlopen error Tunnel connection failed: 403 Forbidden>"
+  },
+  {
+    "url": "https://jmlr.org/papers/v22/20-1364.html",
+    "error": "<urlopen error Tunnel connection failed: 403 Forbidden>"
+  },
+  {
+    "url": "https://arxiv.org/abs/1707.06347",
+    "error": "<urlopen error Tunnel connection failed: 403 Forbidden>"
+  },
+  {
+    "url": "https://api.crossref.org/works/10.1007/978-1-4614-1433-9",
+    "error": "<urlopen error Tunnel connection failed: 403 Forbidden>"
+  }
+]

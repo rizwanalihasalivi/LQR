@@ -1,0 +1,22 @@
+{
+  "status": "passed",
+  "trained_policies": 9,
+  "total_training_steps": 1806336,
+  "evaluation_episodes": 1225,
+  "per_step_trace_files": 1225,
+  "timing_observations": 21000,
+  "mpc_optimizer_failures": 0,
+  "checks": [
+    "checkpoint budget/seed validation",
+    "unique episode keys",
+    "all trace lengths and finite values",
+    "all steering constraints",
+    "penalized metrics recomputed from traces",
+    "command generation causality",
+    "zero-delay frozen full/no-gain equality",
+    "timing sample counts",
+    "valid editable DOCX and native Word mathematics",
+    "all twelve reviewer responses present"
+  ],
+  "scope": "Integrity checks confirm reported experiment execution and document consistency, not physical safety or reviewer acceptance."
+}

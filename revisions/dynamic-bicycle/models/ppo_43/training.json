@@ -1,0 +1,10 @@
+{
+  "seed": 43,
+  "kind": "ppo",
+  "requested_steps": 200704,
+  "actual_steps": 200704,
+  "seconds": 134.84164929389954,
+  "device": "cpu",
+  "policy_distribution": "diagonal Gaussian with learned state-independent log_std; action clipped to [-1,1] by SB3 before env; deterministic evaluation uses clipped mean; no tanh output claim",
+  "curriculum": "none: fixed 25 m/s DLC; new matched reconstruction campaign, not original curriculum replication"
+}

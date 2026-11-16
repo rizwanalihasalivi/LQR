@@ -1,0 +1,18 @@
+{
+  "queue_30ms_exact_execution": [
+    0.0,
+    0.0,
+    0.0,
+    0.2,
+    0.3
+  ],
+  "fifo_no_premature_execution": true,
+  "original_beta_preserved": true,
+  "exact_zoh_matches_continuous_augmentation": true,
+  "independent_physical_bicycle_integration_max_error": 4.365605099643233e-14,
+  "independent_physical_bicycle_cases": 9,
+  "reward_intervention_identical_trajectory_steps": 1000,
+  "discrete_lyapunov_max_residual": 1.6984813555609435e-10,
+  "local_lqr_invariant_ellipsoid_c": 8.97528484712706,
+  "limitation": "Ellipsoid certificate applies only to zero-reference zero-residual no-delay local LQR; delayed or saturated hybrid globally is not certified."
+}
