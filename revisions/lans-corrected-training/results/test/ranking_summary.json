@@ -1,0 +1,94 @@
+{
+  "historical_tracking": {
+    "corrected_lans": {
+      "first_or_joint_first": 6,
+      "mean_rank": 1.5714285714285714
+    },
+    "previous_ppo": {
+      "first_or_joint_first": 8,
+      "mean_rank": 1.4285714285714286
+    },
+    "fast_lqr": {
+      "first_or_joint_first": 0,
+      "mean_rank": 3.9285714285714284
+    },
+    "mpc": {
+      "first_or_joint_first": 0,
+      "mean_rank": 3.0714285714285716
+    }
+  },
+  "equal_pretraining": {
+    "corrected_lans": {
+      "first_or_joint_first": 9,
+      "mean_rank": 1.3571428571428572
+    },
+    "corrected_ppo": {
+      "first_or_joint_first": 5,
+      "mean_rank": 1.7857142857142858
+    },
+    "fast_lqr": {
+      "first_or_joint_first": 0,
+      "mean_rank": 3.857142857142857
+    },
+    "mpc": {
+      "first_or_joint_first": 0,
+      "mean_rank": 3.0
+    }
+  },
+  "objective_matched": {
+    "corrected_lans": {
+      "first_or_joint_first": 5,
+      "mean_rank": 1.7857142857142858
+    },
+    "corrected_ppo": {
+      "first_or_joint_first": 3,
+      "mean_rank": 2.142857142857143
+    },
+    "fast_lqr": {
+      "first_or_joint_first": 0,
+      "mean_rank": 3.357142857142857
+    },
+    "matched_mpc": {
+      "first_or_joint_first": 6,
+      "mean_rank": 2.7142857142857144
+    }
+  },
+  "all_references": {
+    "corrected_lans": {
+      "first_or_joint_first": 0,
+      "mean_rank": 3.5714285714285716
+    },
+    "corrected_ppo": {
+      "first_or_joint_first": 0,
+      "mean_rank": 4.357142857142857
+    },
+    "new_bc_lans": {
+      "first_or_joint_first": 0,
+      "mean_rank": 4.0
+    },
+    "new_bc_ppo": {
+      "first_or_joint_first": 0,
+      "mean_rank": 4.642857142857143
+    },
+    "previous_lans": {
+      "first_or_joint_first": 4,
+      "mean_rank": 3.5714285714285716
+    },
+    "previous_ppo": {
+      "first_or_joint_first": 4,
+      "mean_rank": 3.7142857142857144
+    },
+    "matched_mpc": {
+      "first_or_joint_first": 6,
+      "mean_rank": 5.571428571428571
+    },
+    "mpc": {
+      "first_or_joint_first": 0,
+      "mean_rank": 7.357142857142857
+    },
+    "fast_lqr": {
+      "first_or_joint_first": 0,
+      "mean_rank": 8.214285714285714
+    }
+  }
+}

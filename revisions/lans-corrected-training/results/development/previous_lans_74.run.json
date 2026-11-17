@@ -1,0 +1,701 @@
+{
+  "stage": "development",
+  "kind": "previous_lans",
+  "seed": 74,
+  "status": "completed",
+  "started": 1794891920.9838662,
+  "protocol_sha256": "b6153ab75d5038ecab348a2c08b90454f7cc6cc29c5eecb427e3406d9c0152e8",
+  "checkpoint_sha256": "b0cedf6085671a298a9bc80e9dcc1cb4231ae235eb360b4e05a69720091a0ade",
+  "cases": [
+    {
+      "path": "dlc",
+      "delay": "none",
+      "mass": 1650.0,
+      "amplitude": 0.94,
+      "time_scale": 1.03,
+      "physical_seed": 31000
+    },
+    {
+      "path": "dlc",
+      "delay": "none",
+      "mass": 1650.0,
+      "amplitude": 0.94,
+      "time_scale": 1.03,
+      "physical_seed": 31001
+    },
+    {
+      "path": "dlc",
+      "delay": "none",
+      "mass": 1650.0,
+      "amplitude": 0.94,
+      "time_scale": 1.03,
+      "physical_seed": 31002
+    },
+    {
+      "path": "dlc",
+      "delay": "mixed",
+      "mass": 1650.0,
+      "amplitude": 0.94,
+      "time_scale": 1.03,
+      "physical_seed": 31000
+    },
+    {
+      "path": "dlc",
+      "delay": "mixed",
+      "mass": 1650.0,
+      "amplitude": 0.94,
+      "time_scale": 1.03,
+      "physical_seed": 31001
+    },
+    {
+      "path": "dlc",
+      "delay": "mixed",
+      "mass": 1650.0,
+      "amplitude": 0.94,
+      "time_scale": 1.03,
+      "physical_seed": 31002
+    },
+    {
+      "path": "dlc",
+      "delay": "fixed200",
+      "mass": 1650.0,
+      "amplitude": 0.94,
+      "time_scale": 1.03,
+      "physical_seed": 31000
+    },
+    {
+      "path": "dlc",
+      "delay": "fixed200",
+      "mass": 1650.0,
+      "amplitude": 0.94,
+      "time_scale": 1.03,
+      "physical_seed": 31001
+    },
+    {
+      "path": "dlc",
+      "delay": "fixed200",
+      "mass": 1650.0,
+      "amplitude": 0.94,
+      "time_scale": 1.03,
+      "physical_seed": 31002
+    },
+    {
+      "path": "step",
+      "delay": "none",
+      "mass": 1650.0,
+      "amplitude": 0.94,
+      "time_scale": 1.03,
+      "physical_seed": 31000
+    },
+    {
+      "path": "step",
+      "delay": "none",
+      "mass": 1650.0,
+      "amplitude": 0.94,
+      "time_scale": 1.03,
+      "physical_seed": 31001
+    },
+    {
+      "path": "step",
+      "delay": "none",
+      "mass": 1650.0,
+      "amplitude": 0.94,
+      "time_scale": 1.03,
+      "physical_seed": 31002
+    },
+    {
+      "path": "step",
+      "delay": "mixed",
+      "mass": 1650.0,
+      "amplitude": 0.94,
+      "time_scale": 1.03,
+      "physical_seed": 31000
+    },
+    {
+      "path": "step",
+      "delay": "mixed",
+      "mass": 1650.0,
+      "amplitude": 0.94,
+      "time_scale": 1.03,
+      "physical_seed": 31001
+    },
+    {
+      "path": "step",
+      "delay": "mixed",
+      "mass": 1650.0,
+      "amplitude": 0.94,
+      "time_scale": 1.03,
+      "physical_seed": 31002
+    },
+    {
+      "path": "step",
+      "delay": "fixed200",
+      "mass": 1650.0,
+      "amplitude": 0.94,
+      "time_scale": 1.03,
+      "physical_seed": 31000
+    },
+    {
+      "path": "step",
+      "delay": "fixed200",
+      "mass": 1650.0,
+      "amplitude": 0.94,
+      "time_scale": 1.03,
+      "physical_seed": 31001
+    },
+    {
+      "path": "step",
+      "delay": "fixed200",
+      "mass": 1650.0,
+      "amplitude": 0.94,
+      "time_scale": 1.03,
+      "physical_seed": 31002
+    },
+    {
+      "path": "sine",
+      "delay": "none",
+      "mass": 1650.0,
+      "amplitude": 0.94,
+      "time_scale": 1.03,
+      "physical_seed": 31000
+    },
+    {
+      "path": "sine",
+      "delay": "none",
+      "mass": 1650.0,
+      "amplitude": 0.94,
+      "time_scale": 1.03,
+      "physical_seed": 31001
+    },
+    {
+      "path": "sine",
+      "delay": "none",
+      "mass": 1650.0,
+      "amplitude": 0.94,
+      "time_scale": 1.03,
+      "physical_seed": 31002
+    },
+    {
+      "path": "sine",
+      "delay": "mixed",
+      "mass": 1650.0,
+      "amplitude": 0.94,
+      "time_scale": 1.03,
+      "physical_seed": 31000
+    },
+    {
+      "path": "sine",
+      "delay": "mixed",
+      "mass": 1650.0,
+      "amplitude": 0.94,
+      "time_scale": 1.03,
+      "physical_seed": 31001
+    },
+    {
+      "path": "sine",
+      "delay": "mixed",
+      "mass": 1650.0,
+      "amplitude": 0.94,
+      "time_scale": 1.03,
+      "physical_seed": 31002
+    },
+    {
+      "path": "sine",
+      "delay": "fixed200",
+      "mass": 1650.0,
+      "amplitude": 0.94,
+      "time_scale": 1.03,
+      "physical_seed": 31000
+    },
+    {
+      "path": "sine",
+      "delay": "fixed200",
+      "mass": 1650.0,
+      "amplitude": 0.94,
+      "time_scale": 1.03,
+      "physical_seed": 31001
+    },
+    {
+      "path": "sine",
+      "delay": "fixed200",
+      "mass": 1650.0,
+      "amplitude": 0.94,
+      "time_scale": 1.03,
+      "physical_seed": 31002
+    },
+    {
+      "path": "slalom",
+      "delay": "none",
+      "mass": 1650.0,
+      "amplitude": 0.94,
+      "time_scale": 1.03,
+      "physical_seed": 31000
+    },
+    {
+      "path": "slalom",
+      "delay": "none",
+      "mass": 1650.0,
+      "amplitude": 0.94,
+      "time_scale": 1.03,
+      "physical_seed": 31001
+    },
+    {
+      "path": "slalom",
+      "delay": "none",
+      "mass": 1650.0,
+      "amplitude": 0.94,
+      "time_scale": 1.03,
+      "physical_seed": 31002
+    },
+    {
+      "path": "slalom",
+      "delay": "mixed",
+      "mass": 1650.0,
+      "amplitude": 0.94,
+      "time_scale": 1.03,
+      "physical_seed": 31000
+    },
+    {
+      "path": "slalom",
+      "delay": "mixed",
+      "mass": 1650.0,
+      "amplitude": 0.94,
+      "time_scale": 1.03,
+      "physical_seed": 31001
+    },
+    {
+      "path": "slalom",
+      "delay": "mixed",
+      "mass": 1650.0,
+      "amplitude": 0.94,
+      "time_scale": 1.03,
+      "physical_seed": 31002
+    },
+    {
+      "path": "slalom",
+      "delay": "fixed200",
+      "mass": 1650.0,
+      "amplitude": 0.94,
+      "time_scale": 1.03,
+      "physical_seed": 31000
+    },
+    {
+      "path": "slalom",
+      "delay": "fixed200",
+      "mass": 1650.0,
+      "amplitude": 0.94,
+      "time_scale": 1.03,
+      "physical_seed": 31001
+    },
+    {
+      "path": "slalom",
+      "delay": "fixed200",
+      "mass": 1650.0,
+      "amplitude": 0.94,
+      "time_scale": 1.03,
+      "physical_seed": 31002
+    },
+    {
+      "path": "dlc",
+      "delay": "none",
+      "mass": 1100.0,
+      "amplitude": 0.94,
+      "time_scale": 1.03,
+      "physical_seed": 31000
+    },
+    {
+      "path": "dlc",
+      "delay": "none",
+      "mass": 1100.0,
+      "amplitude": 0.94,
+      "time_scale": 1.03,
+      "physical_seed": 31001
+    },
+    {
+      "path": "dlc",
+      "delay": "none",
+      "mass": 1100.0,
+      "amplitude": 0.94,
+      "time_scale": 1.03,
+      "physical_seed": 31002
+    },
+    {
+      "path": "dlc",
+      "delay": "none",
+      "mass": 2200.0,
+      "amplitude": 0.94,
+      "time_scale": 1.03,
+      "physical_seed": 31000
+    },
+    {
+      "path": "dlc",
+      "delay": "none",
+      "mass": 2200.0,
+      "amplitude": 0.94,
+      "time_scale": 1.03,
+      "physical_seed": 31001
+    },
+    {
+      "path": "dlc",
+      "delay": "none",
+      "mass": 2200.0,
+      "amplitude": 0.94,
+      "time_scale": 1.03,
+      "physical_seed": 31002
+    },
+    {
+      "path": "dlc",
+      "delay": "none",
+      "mass": 1650.0,
+      "amplitude": 1.06,
+      "time_scale": 0.97,
+      "physical_seed": 31000
+    },
+    {
+      "path": "dlc",
+      "delay": "none",
+      "mass": 1650.0,
+      "amplitude": 1.06,
+      "time_scale": 0.97,
+      "physical_seed": 31001
+    },
+    {
+      "path": "dlc",
+      "delay": "none",
+      "mass": 1650.0,
+      "amplitude": 1.06,
+      "time_scale": 0.97,
+      "physical_seed": 31002
+    },
+    {
+      "path": "dlc",
+      "delay": "mixed",
+      "mass": 1650.0,
+      "amplitude": 1.06,
+      "time_scale": 0.97,
+      "physical_seed": 31000
+    },
+    {
+      "path": "dlc",
+      "delay": "mixed",
+      "mass": 1650.0,
+      "amplitude": 1.06,
+      "time_scale": 0.97,
+      "physical_seed": 31001
+    },
+    {
+      "path": "dlc",
+      "delay": "mixed",
+      "mass": 1650.0,
+      "amplitude": 1.06,
+      "time_scale": 0.97,
+      "physical_seed": 31002
+    },
+    {
+      "path": "dlc",
+      "delay": "fixed200",
+      "mass": 1650.0,
+      "amplitude": 1.06,
+      "time_scale": 0.97,
+      "physical_seed": 31000
+    },
+    {
+      "path": "dlc",
+      "delay": "fixed200",
+      "mass": 1650.0,
+      "amplitude": 1.06,
+      "time_scale": 0.97,
+      "physical_seed": 31001
+    },
+    {
+      "path": "dlc",
+      "delay": "fixed200",
+      "mass": 1650.0,
+      "amplitude": 1.06,
+      "time_scale": 0.97,
+      "physical_seed": 31002
+    },
+    {
+      "path": "step",
+      "delay": "none",
+      "mass": 1650.0,
+      "amplitude": 1.06,
+      "time_scale": 0.97,
+      "physical_seed": 31000
+    },
+    {
+      "path": "step",
+      "delay": "none",
+      "mass": 1650.0,
+      "amplitude": 1.06,
+      "time_scale": 0.97,
+      "physical_seed": 31001
+    },
+    {
+      "path": "step",
+      "delay": "none",
+      "mass": 1650.0,
+      "amplitude": 1.06,
+      "time_scale": 0.97,
+      "physical_seed": 31002
+    },
+    {
+      "path": "step",
+      "delay": "mixed",
+      "mass": 1650.0,
+      "amplitude": 1.06,
+      "time_scale": 0.97,
+      "physical_seed": 31000
+    },
+    {
+      "path": "step",
+      "delay": "mixed",
+      "mass": 1650.0,
+      "amplitude": 1.06,
+      "time_scale": 0.97,
+      "physical_seed": 31001
+    },
+    {
+      "path": "step",
+      "delay": "mixed",
+      "mass": 1650.0,
+      "amplitude": 1.06,
+      "time_scale": 0.97,
+      "physical_seed": 31002
+    },
+    {
+      "path": "step",
+      "delay": "fixed200",
+      "mass": 1650.0,
+      "amplitude": 1.06,
+      "time_scale": 0.97,
+      "physical_seed": 31000
+    },
+    {
+      "path": "step",
+      "delay": "fixed200",
+      "mass": 1650.0,
+      "amplitude": 1.06,
+      "time_scale": 0.97,
+      "physical_seed": 31001
+    },
+    {
+      "path": "step",
+      "delay": "fixed200",
+      "mass": 1650.0,
+      "amplitude": 1.06,
+      "time_scale": 0.97,
+      "physical_seed": 31002
+    },
+    {
+      "path": "sine",
+      "delay": "none",
+      "mass": 1650.0,
+      "amplitude": 1.06,
+      "time_scale": 0.97,
+      "physical_seed": 31000
+    },
+    {
+      "path": "sine",
+      "delay": "none",
+      "mass": 1650.0,
+      "amplitude": 1.06,
+      "time_scale": 0.97,
+      "physical_seed": 31001
+    },
+    {
+      "path": "sine",
+      "delay": "none",
+      "mass": 1650.0,
+      "amplitude": 1.06,
+      "time_scale": 0.97,
+      "physical_seed": 31002
+    },
+    {
+      "path": "sine",
+      "delay": "mixed",
+      "mass": 1650.0,
+      "amplitude": 1.06,
+      "time_scale": 0.97,
+      "physical_seed": 31000
+    },
+    {
+      "path": "sine",
+      "delay": "mixed",
+      "mass": 1650.0,
+      "amplitude": 1.06,
+      "time_scale": 0.97,
+      "physical_seed": 31001
+    },
+    {
+      "path": "sine",
+      "delay": "mixed",
+      "mass": 1650.0,
+      "amplitude": 1.06,
+      "time_scale": 0.97,
+      "physical_seed": 31002
+    },
+    {
+      "path": "sine",
+      "delay": "fixed200",
+      "mass": 1650.0,
+      "amplitude": 1.06,
+      "time_scale": 0.97,
+      "physical_seed": 31000
+    },
+    {
+      "path": "sine",
+      "delay": "fixed200",
+      "mass": 1650.0,
+      "amplitude": 1.06,
+      "time_scale": 0.97,
+      "physical_seed": 31001
+    },
+    {
+      "path": "sine",
+      "delay": "fixed200",
+      "mass": 1650.0,
+      "amplitude": 1.06,
+      "time_scale": 0.97,
+      "physical_seed": 31002
+    },
+    {
+      "path": "slalom",
+      "delay": "none",
+      "mass": 1650.0,
+      "amplitude": 1.06,
+      "time_scale": 0.97,
+      "physical_seed": 31000
+    },
+    {
+      "path": "slalom",
+      "delay": "none",
+      "mass": 1650.0,
+      "amplitude": 1.06,
+      "time_scale": 0.97,
+      "physical_seed": 31001
+    },
+    {
+      "path": "slalom",
+      "delay": "none",
+      "mass": 1650.0,
+      "amplitude": 1.06,
+      "time_scale": 0.97,
+      "physical_seed": 31002
+    },
+    {
+      "path": "slalom",
+      "delay": "mixed",
+      "mass": 1650.0,
+      "amplitude": 1.06,
+      "time_scale": 0.97,
+      "physical_seed": 31000
+    },
+    {
+      "path": "slalom",
+      "delay": "mixed",
+      "mass": 1650.0,
+      "amplitude": 1.06,
+      "time_scale": 0.97,
+      "physical_seed": 31001
+    },
+    {
+      "path": "slalom",
+      "delay": "mixed",
+      "mass": 1650.0,
+      "amplitude": 1.06,
+      "time_scale": 0.97,
+      "physical_seed": 31002
+    },
+    {
+      "path": "slalom",
+      "delay": "fixed200",
+      "mass": 1650.0,
+      "amplitude": 1.06,
+      "time_scale": 0.97,
+      "physical_seed": 31000
+    },
+    {
+      "path": "slalom",
+      "delay": "fixed200",
+      "mass": 1650.0,
+      "amplitude": 1.06,
+      "time_scale": 0.97,
+      "physical_seed": 31001
+    },
+    {
+      "path": "slalom",
+      "delay": "fixed200",
+      "mass": 1650.0,
+      "amplitude": 1.06,
+      "time_scale": 0.97,
+      "physical_seed": 31002
+    },
+    {
+      "path": "dlc",
+      "delay": "none",
+      "mass": 1100.0,
+      "amplitude": 1.06,
+      "time_scale": 0.97,
+      "physical_seed": 31000
+    },
+    {
+      "path": "dlc",
+      "delay": "none",
+      "mass": 1100.0,
+      "amplitude": 1.06,
+      "time_scale": 0.97,
+      "physical_seed": 31001
+    },
+    {
+      "path": "dlc",
+      "delay": "none",
+      "mass": 1100.0,
+      "amplitude": 1.06,
+      "time_scale": 0.97,
+      "physical_seed": 31002
+    },
+    {
+      "path": "dlc",
+      "delay": "none",
+      "mass": 2200.0,
+      "amplitude": 1.06,
+      "time_scale": 0.97,
+      "physical_seed": 31000
+    },
+    {
+      "path": "dlc",
+      "delay": "none",
+      "mass": 2200.0,
+      "amplitude": 1.06,
+      "time_scale": 0.97,
+      "physical_seed": 31001
+    },
+    {
+      "path": "dlc",
+      "delay": "none",
+      "mass": 2200.0,
+      "amplitude": 1.06,
+      "time_scale": 0.97,
+      "physical_seed": 31002
+    }
+  ],
+  "trace_columns": [
+    "time",
+    "error_next",
+    "heading_error_next",
+    "command",
+    "applied",
+    "residual",
+    "gain",
+    "delay_ms",
+    "queue",
+    "ey_before",
+    "ey_dot_before",
+    "heading_before",
+    "heading_dot_before"
+  ],
+  "finished": 1794891996.3516839,
+  "episodes": 84,
+  "completed": 84
+}

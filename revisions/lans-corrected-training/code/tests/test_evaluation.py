@@ -110,6 +110,11 @@ class EvaluationTests(unittest.TestCase):
             root = Path(directory) / 'study'
             protocol_hash = protocol(root)
             files = checkpoints(root)
+            (root / 'results/teacher_cases.json').write_text(json.dumps([
+                dict(completed=True, rmse_penalized=.1),
+                dict(completed=False, rmse_penalized=.2)]))
+            (root / 'results/corpus.json').write_text(json.dumps(dict(
+                rollout_cases=2, teacher_completed=1, mean_penalized_rmse=.15)))
             out = root / 'results/development'
             (out / 'traces').mkdir(parents=True)
             for kind, seed in runner.jobs():
@@ -134,16 +139,29 @@ class EvaluationTests(unittest.TestCase):
             self.assertEqual(audit['completed'], 0)
             self.assertEqual(len(audit['checkpoint_sha256']), 18)
             self.assertEqual(len(audit['log_sha256']), 1)
+            self.assertEqual(audit['offline_teacher']['cases'], 2)
+            self.assertEqual(audit['offline_teacher']['completed'], 1)
+            self.assertEqual(audit['offline_teacher']['failed'], 1)
             aggregate = json.loads((out / 'aggregate.json').read_text())
             self.assertEqual(aggregate['corrected_lans']['completed'], 0)
             self.assertEqual(len(report.read_csv(out / 'summary.csv')), 126)
             self.assertEqual(len(report.read_csv(out / 'paired_differences.csv')), 112)
-            self.assertIn('including failures', (out / 'REVIEW.md').read_text())
+            review = (out / 'REVIEW.md').read_text()
+            self.assertIn('including failures', review)
+            self.assertIn('Preserve the stable previous checkpoint', review)
+            self.assertIn('teacher completed 1/2', review)
+            self.assertIn('output-loss proxy', review)
+            self.assertIn('early termination', review)
             self.assertFalse((root / 'REVIEW.md').exists())
             # An unaccounted trace cannot be silently mixed into this campaign.
             (out / 'traces/extra.npz').write_bytes(b'extra')
             with self.assertRaisesRegex(ValueError, 'Unaccounted'):
                 report.load_campaign(root, 'development')
+            # A claimed all-successful teacher corpus cannot hide its failed case.
+            (root / 'results/corpus.json').write_text(json.dumps(dict(
+                rollout_cases=2, teacher_completed=2, mean_penalized_rmse=.15)))
+            with self.assertRaisesRegex(ValueError, 'retained per-case audit'):
+                report.teacher_evidence(root)
 
 
 if __name__ == '__main__':

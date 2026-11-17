@@ -122,6 +122,30 @@ def markdown_table(headers, rows):
                      ['| ' + ' | '.join(map(str, row)) + ' |' for row in rows])
 
 
+def teacher_evidence(root):
+    teacher_audit = None
+    teacher_text = 'No per-case offline-teacher audit was supplied for this campaign.'
+    teacher_path, corpus_path = root / 'results/teacher_cases.json', root / 'results/corpus.json'
+    if teacher_path.exists() or corpus_path.exists():
+        teacher_cases = json.loads(teacher_path.read_text())
+        corpus = json.loads(corpus_path.read_text())
+        teacher_completed = sum(case['completed'] is True for case in teacher_cases)
+        teacher_mean = float(np.mean([case['rmse_penalized'] for case in teacher_cases]))
+        if (len(teacher_cases) != corpus['rollout_cases'] or teacher_completed != corpus['teacher_completed']
+                or not np.isclose(teacher_mean, corpus['mean_penalized_rmse'], rtol=0, atol=1e-12)):
+            raise ValueError('Offline teacher aggregate does not match its retained per-case audit.')
+        teacher_audit = dict(cases=len(teacher_cases), completed=teacher_completed,
+                                       failed=len(teacher_cases) - teacher_completed,
+                                       mean_penalized_rmse=teacher_mean,
+                                       teacher_cases_sha256=runner.digest(teacher_path),
+                                       corpus_metadata_sha256=runner.digest(corpus_path))
+        teacher_text = (f"The offline teacher completed {teacher_completed}/{len(teacher_cases)} corpus-generation cases; "
+                        f"all {len(teacher_cases) - teacher_completed} failures remain in results/teacher_cases.json. "
+                        'Those teacher outcomes are training-data evidence, not deployed LANS results. '
+                        'The corpus includes the recorded prefixes of failed teacher rollouts rather than claiming every teacher case succeeded.')
+    return teacher_text, teacher_audit
+
+
 def generate(root=ROOT, stage='test'):
     rows, traces = load_campaign(root, stage)
     out = root / 'results' / stage
@@ -199,8 +223,48 @@ def generate(root=ROOT, stage='test'):
                          'run markers and checkpoint/protocol hashes', 'all raw metrics recomputed',
                          'steering bounds', 'no unaccounted traces'],
                  limits='Finite-case scalar simulator evidence; not universal superiority, statistical dominance, physical validation, or proof of additional PPO learning.')
+    teacher_text, teacher_audit = teacher_evidence(root)
+    if teacher_audit is not None:
+        audit['offline_teacher'] = teacher_audit
     (out / 'audit.json').write_text(json.dumps(audit, indent=2))
     lans = totals['corrected_lans']
+    previous = totals['previous_lans']
+    deployment = (f"On these matched current cases, experimental LANS completed {lans['completed']}/{lans['episodes']} "
+                  f"with aggregate penalized RMSE {lans['mean_penalized_rmse']:.6f} m; "
+                  f"previous LANS completed {previous['completed']}/{previous['episodes']} "
+                  f"with {previous['mean_penalized_rmse']:.6f} m.")
+    if lans['completed'] / lans['episodes'] < previous['completed'] / previous['episodes']:
+        deployment += ' Completion regressed against the previous checkpoint on matched cases.'
+    if lans['mean_penalized_rmse'] > previous['mean_penalized_rmse']:
+        deployment += ' Aggregate penalized RMSE also regressed against the previous checkpoint.'
+
+    failed_lans = [row for row in rows if row['kind'] == 'corrected_lans' and row['completed'] == 'False']
+    failure_rows = []
+    for row in failed_lans:
+        with np.load(out / 'traces' / (trace_key(row) + '.npz'), allow_pickle=False) as data:
+            trace = data['trace']
+        reason = ('heading limit' if abs(trace[-1, 2]) > .5 else
+                  ('lateral limit' if abs(trace[-1, 1]) > 2.5 else 'early termination'))
+        completed_peers = [str(other['train_seed']) for other in rows if other['kind'] == 'corrected_lans'
+                           and case_key(other) == case_key(row) and other['completed'] == 'True']
+        failure_rows.append([row['train_seed'], row['physical_seed'],
+                             f"{row['path']}/{row['delay']}/{float(row['mass']):g}",
+                             f"{float(row['amplitude']):g}/{float(row['time_scale']):g}", row['steps'],
+                             reason, f'{trace[-1, 2]:.6f}',
+                             f'{np.max(abs(trace[:, 3] - trace[:, 4])):.6f}',
+                             int(np.max(trace[:, 8])), ','.join(completed_peers) or 'none'])
+    if failure_rows:
+        failure_text = markdown_table(
+            ['Train seed', 'Physical seed', 'Condition', 'Amplitude/time scale', 'Steps',
+             'Exit', 'Final heading (rad)', 'Max command/applied gap (rad)', 'Max queue', 'Completed peer seeds'],
+            failure_rows)
+        failure_text += ('\n\nThe recorded command and applied-command gap reflects the full-command FIFO delay: '
+                         'a newly saturated command can coexist with an older command still being applied. '
+                         'A finite-state heading-limit exit is retained as a control-robustness failure, not a nonfinite-state event. '
+                         'A simulator defect has not been identified by this trace audit. '
+                         'The seed differences are reported rather than selecting only the successful policy.')
+    else:
+        failure_text = 'No corrected-LANS episode failed in this selected campaign.'
     table = []
     for condition in conditions:
         table.append([f'{condition[0]}/{condition[1]}/{condition[2]:g}'] +
@@ -221,6 +285,12 @@ The historical-tracking pool means the previous tracking PPO plus the original L
 
 {markdown_table(['Condition', 'LANS', 'New PPO', 'BC LANS', 'Previous LANS', 'Previous PPO', 'Matched MPC'], table)}
 
+## Retained LANS failures
+
+{failure_text}
+
+{markdown_table(['Controller', 'Completed episodes', 'Aggregate penalized RMSE (m)'], [[kind, str(value['completed']) + '/' + str(value['episodes']), f"{value['mean_penalized_rmse']:.6f}"] for kind, value in totals.items()])}
+
 ## Issues corrected
 
 The inherited 200704-step training curriculum supplied only zero-delay and 0/10ms episodes during the actual 100352-step PPO budget; its mixed and high-delay phases were never reached. Training now covers the declared delay distribution within its actual budget. The output-layer projection previously occurred only before rollouts and after training, allowing intermediate PPO updates outside the declared parameter box; the corrected update hook enforces the constraint after every optimizer step. Both fixes apply to LANS and the equally pretrained PPO.
@@ -228,6 +298,16 @@ The inherited 200704-step training curriculum supplied only zero-delay and 0/10m
 The preview adapter previously subtracted present-state terms after float32 rounding, amplifying cancellation in derivative-sensitive features. The new adapter computes the algebraically equivalent eleven observations before the final float32 conversion. The offline teacher was selected on the declared development grid; this changes training targets and is not a correction to the physical plant or proof that the deployed controller is an analytic teacher.
 
 Evaluation now rejects unknown controller labels, preflights complete output sets, preserves partial runs, includes matched MPC automatically, and records checkpoint/protocol hashes. Reports include every declared comparator and recompute metrics from raw traces. Historical reporting was also repaired to handle an unrestricted PPO validation winner instead of silently omitting it.
+
+## Checkpoint recommendation
+
+This campaign is experimental. Preserve the stable previous checkpoint; the new policies must not replace it merely because they are newer. {deployment} Any future replacement needs an explicit acceptance decision based on the matched comparisons, including failures. All final outcomes are retained; no parameters are retuned after this final test.
+
+## Teacher and training-loss disclosure
+
+{teacher_text}
+
+The training log field named physical_steering_mse is an action-scale-weighted output-loss proxy. For LANS it measures the residual prediction error before the latency gain and final steering saturation; it is not measured post-gain physical steering MSE, trajectory RMSE, or deployment performance. Its existing field name is retained to preserve the frozen training records.
 
 ## Interpretation and limits
 

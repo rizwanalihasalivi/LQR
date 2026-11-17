@@ -1,5 +1,24 @@
 # LQR / LANS research materials
 
+## Controller review and corrected-training experiment
+
+The [subsequent code review and fresh comparison](revisions/lans-corrected-training/REVIEW.md)
+fixes PPO delay-curriculum coverage, per-update projection, evaluation safeguards,
+and preview-conditioning precision. It keeps the same eleven inputs and
+LQR–PPO residual/gain/saturation diagram; no deployed predictor or memory block
+is added.
+
+The new higher-gain retraining is **experimental, not a replacement for the
+previous policies**: it completes 418/420 fresh cases, whereas previous LANS
+completes 420/420 on the identical cases and has lower aggregate penalized RMSE.
+The two new failures and all stronger-baseline/BC-only comparisons are retained.
+Bug corrections do not establish first place in every scenario. See the
+[reproduction instructions](revisions/lans-corrected-training/README.md) and
+[frozen protocol](revisions/lans-corrected-training/results/protocol.json).
+
+The studies below remain historical results; the subsequent code corrections
+have not been retrospectively attributed to their saved checkpoints or reports.
+
 The initial manuscript revision is in [revisions/dynamic-bicycle](revisions/dynamic-bicycle/README.md).
 It retains the LQR–PPO residual framework and uses the dynamic bicycle model, with explicitly documented stiffness-sign and sampled-LQR corrections. Newer experimental studies are listed below; the original revised manuscript has not been silently overwritten with their results.
 
