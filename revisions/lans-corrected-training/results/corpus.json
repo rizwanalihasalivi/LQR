@@ -1,0 +1,9 @@
+{
+  "rows": 380516,
+  "rollout_cases": 384,
+  "teacher_completed": 379,
+  "mean_penalized_rmse": 0.06499498088583079,
+  "seed": 99000,
+  "precision_before_float32": true,
+  "teacher_is_offline_only": true
+}

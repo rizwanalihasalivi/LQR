@@ -1,0 +1,17 @@
+{
+  "scope": "Correctness fixes and validation-selected teacher retraining; same 11 inputs and LQR plus PPO residual topology. No deployed predictor, memory, extra state or controller branch.",
+  "teacher": {"kp":400.0,"kd":40.0,"decay":100.0,"proxy":1.0,"fourth":1.0},
+  "teacher_selection": "40 candidate grid evaluated only on development seeds 31000-31002, scales [0.94,1.03],[1.06,0.97]. Maximize completions then minimize aggregate penalized RMSE. Full search retained.",
+  "training_seeds": [82,83,84],
+  "corpus_seed": 99000,
+  "BC_updates": 6000,
+  "PPO_steps": 100352,
+  "development_seeds": [31000,31001,31002],
+  "development_scales": [[0.94,1.03],[1.06,0.97]],
+  "test_seeds": [33000,33001,33002,33003,33004],
+  "test_scales": [[0.92,1.06],[1.08,0.94]],
+  "comparison": "All three final training seeds; equally pretrained corrected PPO, BC-only ablations, previous three LANS and PPO seeds, original LQR, original MPC and objective-matched MPC. No per-condition controller or seed selection.",
+  "metric": "Same 1001-sample initial-inclusive penalized RMSE; all failures and traces retained; steering limit 0.5 rad; 100 Hz full-command FIFO.",
+  "freeze": "Final policy hashes must be frozen after training and before final evaluation. No final-result-based tuning. These finite-case comparisons cannot prove universal first place or a distinct PPO-learning benefit.",
+  "limitations": "Nominal teacher cannot observe unknown mass. Four-sample policy preview vs twenty-sample MPC preview. Linear small-angle simulator only. Projected PPO actor update is intentionally small; pretraining may dominate."
+}

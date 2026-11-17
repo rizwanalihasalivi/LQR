@@ -1,0 +1,24 @@
+{
+  "checkpoints": {
+    "models/corrected_lans_82/policy.zip": "5b62af1e06f9242008420f5b5658ad107c2a1b24f6c8c16e67492adffb831f38",
+    "models/corrected_lans_83/policy.zip": "922282a6d2ab0bc08999a9896ca9d5747bafe726538ff3f3eeb08ae40fa150dd",
+    "models/corrected_lans_84/policy.zip": "97e44d045970142e10a249b1b21298b5e63fbd36b85bd28eb60b316851370f04",
+    "models/corrected_ppo_82/policy.zip": "aaa4598a9b57737b81b14c94dce4a0b0be8c9ac75a7ce658a1890c573a284f63",
+    "models/corrected_ppo_83/policy.zip": "9973dc06529a5a4903233638d616ccf0eae9e7f0ca5ee5e783531592fd1e9976",
+    "models/corrected_ppo_84/policy.zip": "1f12e4ccb25573af3a88be9322ea4b669d9d9a86f1a33224fac1bc4da3ee354b",
+    "models/corrected_lans_82/bc.zip": "8500cc0eab0bcee733fe1b7a59b3761165ab458ae2cca6c668a172391d284a79",
+    "models/corrected_lans_83/bc.zip": "ddce51089d65eeabf0d0664d08831019f27a3ea1342d77d1119f6d2018229e1e",
+    "models/corrected_lans_84/bc.zip": "dd0a035a1474fedd2698bc5428e84e8ff87279e826aedae8500aadcfc906d408",
+    "models/corrected_ppo_82/bc.zip": "724664d4c299cb2a4d0b7c354143c78f6b13f8eb3521dee3e560be5adc2a41c7",
+    "models/corrected_ppo_83/bc.zip": "efc719c529c45e122c34ab028bd5a6327489fca0bd35736c2468b59195f13c7f",
+    "models/corrected_ppo_84/bc.zip": "d9626eeb39aca493658e2c4160328a10467d6b2cbe46d9cda3846bf7789d73bf",
+    "../lans-tracking-study/models/limited_lans_72/policy.zip": "dab87314ce0b50814ce10b904a2a32c105f20e9ba4cc554b15af516e56c58fb5",
+    "../lans-tracking-study/models/limited_lans_73/policy.zip": "cd1865481b4810d9a769eff0fc5814e13ff2a15414ee2adbe264242241a10b5b",
+    "../lans-tracking-study/models/limited_lans_74/policy.zip": "b0cedf6085671a298a9bc80e9dcc1cb4231ae235eb360b4e05a69720091a0ade",
+    "../lans-tracking-study/models/limited_ppo_72/policy.zip": "ba6a96a5b28216651e82e7b335bde1f8bfeacf11e4c3fce95b9e4526aec7439b",
+    "../lans-tracking-study/models/limited_ppo_73/policy.zip": "6d0bc64de43b2f2460edc88e3954670469d73bf4a13254a573e96b0f71882dff",
+    "../lans-tracking-study/models/limited_ppo_74/policy.zip": "a1337871add7cdbb83ca2ab266869ffafec94abea83e3f1daf0b7289f4790d29"
+  },
+  "protocol_sha256": "b6153ab75d5038ecab348a2c08b90454f7cc6cc29c5eecb427e3406d9c0152e8",
+  "rule": "All three seeds and BC ablations, frozen before final evaluation; no final-result tuning."
+}

@@ -1,0 +1,70 @@
+{
+  "kind": "lans",
+  "seed": 82,
+  "PPO_steps": 100352,
+  "BC_updates": 6000,
+  "BC_log": [
+    {
+      "update": 0,
+      "physical_steering_mse": 0.17525696754455566
+    },
+    {
+      "update": 500,
+      "physical_steering_mse": 0.0016879972536116838
+    },
+    {
+      "update": 1000,
+      "physical_steering_mse": 0.0008982782019302249
+    },
+    {
+      "update": 1500,
+      "physical_steering_mse": 0.0014268270460888743
+    },
+    {
+      "update": 2000,
+      "physical_steering_mse": 0.0010783596662804484
+    },
+    {
+      "update": 2500,
+      "physical_steering_mse": 0.0009436239488422871
+    },
+    {
+      "update": 3000,
+      "physical_steering_mse": 0.0005816485499963164
+    },
+    {
+      "update": 3500,
+      "physical_steering_mse": 0.0009199589840136468
+    },
+    {
+      "update": 4000,
+      "physical_steering_mse": 0.0009450088255107403
+    },
+    {
+      "update": 4500,
+      "physical_steering_mse": 0.000781936279963702
+    },
+    {
+      "update": 5000,
+      "physical_steering_mse": 0.0005565043538808823
+    },
+    {
+      "update": 5500,
+      "physical_steering_mse": 0.0006723704282194376
+    }
+  ],
+  "projection_optimizer_steps": 15680,
+  "max_output_parameter_change": 1.0013580322265625e-05,
+  "training_delay_coverage": {
+    "total": 100352,
+    "zero": 37120,
+    "above_10ms": 48131,
+    "at_200ms": 14000,
+    "maximum_ms": 200.0
+  },
+  "seconds": 152.77766871452332,
+  "features": 11,
+  "architecture": "64x64 ReLU",
+  "teacher_is_offline_only": true,
+  "precision_before_float32": true
+}
