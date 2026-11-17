@@ -6,9 +6,12 @@ SOURCE=Path(__file__).resolve().parents[2]/'dynamic-bicycle/code'
 sys.path.insert(1,str(SOURCE))
 from dynamic_env import DynamicEnv,HORIZON,DT
 class ImprovedEnv(DynamicEnv):
- def __init__(self,*,kind='lans',residual_scale=.02,beta_decay=.8,training=False,amplitude=1.,time_scale=1.,**kwargs):
+ def __init__(self,*,kind='lans',residual_scale=.02,beta_decay=.8,training=False,amplitude=1.,time_scale=1.,training_budget=200704,training_delay_curriculum=True,**kwargs):
   self.residual_scale=residual_scale;self.beta_decay=beta_decay;self.amplitude=amplitude;self.time_scale=time_scale
-  self.training_episode=0;self.total_steps=0;self.training_budget=200704
+  if training_budget<=0:raise ValueError('training_budget must be positive')
+  self.training_episode=0;self.total_steps=0;self.training_budget=int(training_budget)
+  self.training_delay_curriculum=bool(training_delay_curriculum)
+  self.training_delay_steps=dict(total=0,zero=0,above_10ms=0,at_200ms=0,maximum_ms=0.)
   super().__init__(variant=kind,training=training,**kwargs)
   if not training:self._reference()
  def _reference(self):
@@ -24,7 +27,7 @@ class ImprovedEnv(DynamicEnv):
    self.mass=float(self.np_random.uniform(1100,2200))
    from dynamic_env import plant
    self.Ad,self.Bd,self.Gd,self.Hd=plant(self.mass,self.vx)
-   phase=self.total_steps/self.training_budget
+   phase=self.total_steps/self.training_budget if self.training_delay_curriculum else 1.
    if phase<.25:self.delays[:]=0
    elif phase<.5:self.delays[:]=float(self.np_random.choice([0,10]))
    elif self.np_random.random()<.3:
@@ -49,6 +52,11 @@ class ImprovedEnv(DynamicEnv):
   else:gain=float(np.exp(-self.beta_decay*max(0.,delay-5)))
   return float(np.clip(base+gain*res,-.5,.5)),res,gain,base
  def step(self,action):
+  if self.training:
+   delay=float(self.delays[self.k]);coverage=self.training_delay_steps
+   coverage['total']+=1;coverage['zero']+=int(delay==0.)
+   coverage['above_10ms']+=int(delay>10.);coverage['at_200ms']+=int(delay==200.)
+   coverage['maximum_ms']=max(coverage['maximum_ms'],delay)
   previous=self.prev_u
   obs,old_r,t,tr,info=super().step(action)
   # Reward no longer credits an external latency value as controlled computation.

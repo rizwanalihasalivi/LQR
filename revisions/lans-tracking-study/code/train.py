@@ -12,7 +12,7 @@ p=argparse.ArgumentParser();p.add_argument('--kind',choices=['lans','ppo'],requi
 torch.set_num_threads(1);torch.set_num_interop_threads(1)
 params=json.loads((ROOT/'results/teacher_search.json').read_text())['selected']['parameters']
 dest=ROOT/'models'/f'{a.kind}_{a.seed}';dest.mkdir(exist_ok=True)
-env=Monitor(NetworkEnv(kind=a.kind,training=True,delay_mode='none'),str(dest/'monitor'))
+env=Monitor(NetworkEnv(kind=a.kind,training=True,delay_mode='none',training_budget=P['training']['PPO_steps']),str(dest/'monitor'))
 m=PPO('MlpPolicy',env,seed=a.seed,device='cpu',learning_rate=P['training']['PPO_learning_rate'],n_steps=1024,batch_size=64,n_epochs=10,gamma=.99,gae_lambda=.95,clip_range=.2,ent_coef=0.,vf_coef=.5,policy_kwargs=dict(net_arch=dict(pi=[64,64],vf=[64,64]),activation_fn=torch.nn.ReLU,log_std_init=-5.7 if a.kind=='lans' else -5.),verbose=0)
 # Encode exact linear zero-delay teacher in the existing ReLU network.
 w=np.array([teacher(unwhiten(np.eye(11)[j]*.01),params)/.01 for j in range(11)])
@@ -39,5 +39,5 @@ for step in range(P['training']['BC_updates']):
 m.save(dest/'bc')
 (dest/'bc_log.json').write_text(json.dumps(logs,indent=2));bc_seconds=time.time()-start
 m.learn(P['training']['PPO_steps']);m.save(dest/'policy')
-meta=dict(kind=a.kind,seed=a.seed,BC_updates=P['training']['BC_updates'],BC_seconds=bc_seconds,last_BC_physical_MSE=logs[-1]['physical_steering_mse'],PPO_steps=m.num_timesteps,total_seconds=time.time()-start,teacher_is_offline_only=True,features=11,policy_architecture='64x64ReLU',corpus_rows=len(X),PPO_learning_rate=P['training']['PPO_learning_rate'])
+meta=dict(kind=a.kind,seed=a.seed,BC_updates=P['training']['BC_updates'],BC_seconds=bc_seconds,last_BC_physical_MSE=logs[-1]['physical_steering_mse'],PPO_steps=m.num_timesteps,total_seconds=time.time()-start,teacher_is_offline_only=True,features=11,policy_architecture='64x64ReLU',corpus_rows=len(X),PPO_learning_rate=P['training']['PPO_learning_rate'],training_delay_curriculum=True,training_budget=env.unwrapped.training_budget,training_delay_coverage=env.unwrapped.training_delay_steps)
 (dest/'training.json').write_text(json.dumps(meta,indent=2));print(json.dumps(meta),flush=True)

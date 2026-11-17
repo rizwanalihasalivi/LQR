@@ -1,5 +1,25 @@
 # Same-framework precision and delay-tracking study
 
+## Subsequent code corrections
+
+The committed policies, tables and report below are historical results; they
+have not been recomputed or relabelled. A subsequent review fixed two training
+defects: the PPO curriculum used a 200704-step budget for a 100352-step run,
+and output projection ran only before rollouts rather than after every optimizer
+step. Fine-tuning now trains on the full delay distribution immediately and
+records actual delay coverage. These corrected defaults do not exactly reproduce
+the historical training procedure.
+
+Evaluation now rejects unknown controller names and existing result/trace files,
+includes objective-matched MPC in its runner, and supports a validation-selected
+unrestricted PPO reference in reporting. Use a fresh study directory to preserve
+old experiments; `--overwrite` is only for intentional validation replacement.
+The frozen final-test runner still rejects re-execution.
+
+Run regression checks with `python code/test_training.py` and
+`python -m unittest discover -s code/tests -v`. New training and precision
+experiments are retained separately in `../lans-corrected-training`.
+
 This study retains the same dynamic bicycle model/parameter magnitudes,100Hz full-command FIFO execution,LQR+scalar neural PPO residual+exponential gain+saturation topology,and11 original observation channels. It does NOT add a predictor,MPC controller,queue/history input or extra vehicle state to deployed LANS.
 
 Changes are explicit: model-informed offline supervision for the existing policy, invertible conditioning of the four existing40ms preview channels, residual scale1.0rad with final physical steering still clipped±0.5rad, and exponential decay0.002/ms. Thus this is not an unchanged-parameter reproduction. The previous robust LQR gain is retained.

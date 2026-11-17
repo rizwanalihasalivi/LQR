@@ -9,6 +9,7 @@ from dynamic_env import design,DynamicEnv
 from mpc import MPC
 from matched_mpc import MatchedMPC
 from protocol import P
+SUPPORTED_KINDS=('limited_lans','limited_ppo','rl_lans','rl_ppo','bc_lans','bc_ppo','original_ppo','previous_lans','fast_lqr','robust_lqr','mpc','matched_mpc')
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.append(str(ROOT.parent/'lans-robust-fallback/code'))
 from robust_env import RobustEnv
@@ -22,6 +23,7 @@ def cases(stage):
   for mass in [1100.,2200.]:
    for ps in seeds:yield dict(path='dlc',delay='none',mass=mass,amplitude=amp,time_scale=ts,physical_seed=ps)
 def load(kind,seed):
+ if kind not in SUPPORTED_KINDS:raise ValueError(f'Unsupported controller: {kind}')
  if kind in ['limited_lans','limited_ppo']:
   family=kind.split('_')[1]
   return PPO.load(ROOT/'models'/f'limited_{family}_{seed}'/'policy.zip',device='cpu')
@@ -31,10 +33,15 @@ def load(kind,seed):
  if kind=='original_ppo':return PPO.load(ROOT.parent/'dynamic-bicycle/models'/f'ppo_{seed}/policy.zip',device='cpu')
  if kind=='previous_lans':return PPO.load(ROOT.parent/'lans-robust-fallback/models'/f'lans_{seed}/policy.zip',device='cpu')
  return None
+def ensure_fresh_output(out,kind,seed,overwrite=False):
+ if not overwrite and ((out/f'{kind}_{seed}.csv').exists() or any((out/'traces').glob(f'{kind}_{seed}_*.npz'))):
+  raise FileExistsError(f'Results already exist for {kind}, seed {seed} in {out}; use a fresh study or explicit --overwrite.')
+
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--stage',choices=['validation','test'],required=True);p.add_argument('--kind',required=True);p.add_argument('--seed',type=int,default=-1);a=p.parse_args()
+ p=argparse.ArgumentParser();p.add_argument('--stage',choices=['validation','test'],required=True);p.add_argument('--kind',choices=SUPPORTED_KINDS,required=True);p.add_argument('--seed',type=int,default=-1);p.add_argument('--overwrite',action='store_true');a=p.parse_args()
+ out=ROOT/'results'/a.stage;ensure_fresh_output(out,a.kind,a.seed,a.overwrite)
  torch.set_num_threads(1);torch.set_num_interop_threads(1);policy=load(a.kind,a.seed)
- rows=[];out=ROOT/'results'/a.stage;out.mkdir(exist_ok=True);(out/'traces').mkdir(exist_ok=True)
+ rows=[];out.mkdir(exist_ok=True);(out/'traces').mkdir(exist_ok=True)
  for c in cases(a.stage):
   kwargs=dict(path=c['path'],mass=c['mass'],delay_mode=c['delay'],amplitude=c['amplitude'],time_scale=c['time_scale'])
   if a.kind=='previous_lans':e=RobustEnv(kind='lans',**kwargs)
