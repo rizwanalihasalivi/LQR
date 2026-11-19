@@ -1,0 +1,12 @@
+{
+  "source": "trial/policy_74.zip",
+  "training_cases": [
+    22500,
+    22501,
+    22502
+  ],
+  "samples": 27600,
+  "nominal_samples": 16560,
+  "updates": 1800,
+  "scope": "Offline supervised revision of the existing PPO-trained actor."
+}

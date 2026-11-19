@@ -1,0 +1,15 @@
+scenario,delay,mass_kg,lans_rank,ppo_rank,lqr_rank,mpc_rank
+DLC,none,1650,2,3,4,1
+DLC,mixed,1650,1,2,3,4
+DLC,fixed200,1650,1,2,3,4
+Smooth step,none,1650,2,3,4,1
+Smooth step,mixed,1650,1,2,3,4
+Smooth step,fixed200,1650,1,2,3,4
+Sine,none,1650,2,3,4,1
+Sine,mixed,1650,1,2,3,4
+Sine,fixed200,1650,1,2,3,4
+Slalom,none,1650,2,3,4,1
+Slalom,mixed,1650,1,2,3,4
+Slalom,fixed200,1650,1,2,3,4
+DLC,none,1100,2,3,4,1
+DLC,none,2200,2,3,4,1

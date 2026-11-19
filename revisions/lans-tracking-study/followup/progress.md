@@ -1,0 +1,178 @@
+# Same-framework LANS follow-up
+
+The benchmark is the tracking study with policy seeds 72–74 and physical seeds 26000–26004, matched reference scales and 14 conditions. The metric is mean failure-penalized RMSE against the unchanged limited PPO, fast LQR and objective-matched MPC episode results. The original policies and study results remain in their original directories.
+
+## Diagnosis
+
+For the 1650 kg nominal conditions, summing squared lateral error from the saved traces gives about 0.0110–0.0111 m² across the first 25 updates for LANS and 0.00184 m² for matched MPC, averaged per episode and excluding the initial state. For 1100 kg and 2200 kg DLC, LANS also accumulates 0.0263 and 0.0293 m² after update 25, respectively. The mass is available to the simulator and absent from the 11 actor inputs. The traces show a mass-dependent error pattern without establishing that adding mass would solve it.
+
+The bounded, offline full-reference optimization on calibration seeds 22800–22802 found solutions only about 0.01% below matched MPC's mean penalized RMSE for the four nominal-mass conditions. The corresponding gaps for the two off-nominal mass conditions were about 0.6% and 0.8%. Those diagnostic solutions use exact mass and the entire reference. They establish that the observed comparison margin is small on those cases. They provide neither a causal deployment method nor a proof of optimality across scenarios.
+
+## Reproducing the trials
+
+Run from the tracking study directory, with the repository's Python 3.12 environment and single-threaded BLAS.
+
+```bash
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1
+python followup/tune_head.py followup/calibration/standard_matched_mpc.csv followup/replay_balanced
+python followup/tune_head.py followup/calibration/standard_matched_mpc.csv followup/replay_nominal nominal
+python followup/tune_head.py followup/calibration/matched_mpc.csv followup/replay_broad broad
+python followup/score.py test followup/replay_broad followup/replay_broad
+```
+
+The broad search uses distinct calibration seeds 22800–22805 and two reference scales. It modifies only the final actor weight matrix and bias of each of the three existing policy seeds. It does not access test scores during search. The study uses the same gain, control composition, delay queue, simulator, and 11 observations.
+
+The balanced, nominal, broad and blend searches and offline distillation trials each preserve their own checkpoints and results. The broad validation selection produced 8/14 first and 504/504 complete. On the original benchmark, the broad head update reached 7/14 first and 420/420 complete. It retained the five original wins and added mixed sine and mixed step. Mixed DLC remained second, with mean RMSE 0.52% above PPO. All six no-delay conditions remained behind matched MPC.
+
+The original scalar evaluator reproduced the broad candidate's 7/14 result. An independent replay used physical seeds 22950–22954 and reference scales (0.90, 1.02) and (1.14, 0.94), with all three reference controllers rerun. The broad candidate ranked first in 8/14 there and completed 420/420. The benchmark still stands at 7/14. The blend candidate had 6/14 first on the benchmark and 420/420 completions.
+
+The same constrained offline diagnostic on the original benchmark narrowed the four 1650 kg nominal cases to a margin of 0.115–0.128% below MPC. The margins at 1100 kg and 2200 kg were 0.991% and 1.188%. Both sets of oracle diagnostics are saved. The more aggressive zero-regularization solve returned an inaccurate-solution status, so no result from that solve was used. Constrained-oracle distillation preserved all 84 validation completions at 400 and 1200 updates, with 1/14 first at each checkpoint. At 3200 updates it dropped to 69/84 completions and 0/14 first. None of those checkpoints qualified for the benchmark.
+
+The final worst-delay-margin head search reached 8/14 on broad calibration. It reduced aggregate error but had 5/14 first on both the original benchmark and independent replay, with 420/420 completions on each. The broad candidate remains the retained follow-up by first-place count.
+
+## Initial-transient lower bound
+
+Run `python followup/nominal_bound.py` to reproduce the bounded least-squares calculation for the first 40 no-delay updates of every original benchmark case. For each initial state, the calculation grants the optimizer exact mass and reference and any steering sequence within ±0.5 rad. It drops future error after update 40 and imposes no terminal condition. A supporting hyperplane to the quadratic tracking objective gives a lower bound under the same steering constraints. The fixed initial error is included before applying the benchmark RMSE normalization and averaging episodes. This relaxation is for diagnosis and supplies no deployment inputs.
+
+For the four 1650 kg cases, matched MPC is within 1.55–1.71 micrometers of this mean RMSE lower bound. A strict first place at that mass is confined to a window of 0.118–0.130% below MPC. The two off-nominal mass windows are wider, at 12.20 and 16.71 micrometers. These are upper limits on how much a feasible controller could improve over MPC on those specific cases, with no guarantee a causal controller can attain them.
+
+## Mixed-delay follow-up
+
+The mixed-delay search starts from the broad checkpoints. It fits output-head directions to state and observed latency features on the existing broad calibration split, with an explicit objective for mean and worst mixed-delay error and penalties for fixed-delay and nominal regressions. All eight broad calibration wins were required for candidate retention.
+
+```bash
+python followup/tune_head.py followup/calibration/matched_mpc.csv followup/replay_mixed mixed
+python followup/score.py test followup/replay_mixed followup/replay_mixed
+python followup/score.py heldout followup/replay_mixed followup/replay_mixed --mpc followup/heldout/matched_mpc.csv
+```
+
+The selected candidate retained 8/14 first on calibration and completed all 504 calibration episodes. On the original benchmark it had 6/14 first and 420/420 complete. Mixed DLC remained second, with RMSE 0.697% above frozen PPO. Mixed step slipped to second, 0.364% above PPO. The unchanged independent replay gave 7/14 first and 420/420 complete. The broad candidate remains the best retained result at 7/14 benchmark and 8/14 independent replay.
+
+The nominal DLC first-steering diagnostic (`python followup/shared_initial_action.py`) compared independent 40-update optimal steering sequences for the three benchmark masses to a joint fit with a shared first action. Each seed/reference pair has identical initial observations across masses. All ten pairs wanted the same saturated initial steering across masses. Forcing agreement had no measurable prefix squared-error penalty. This rules out a mass-dependent first-action conflict on these cases. It leaves subsequent transient control and later tracking error as open questions.
+
+Replaying the retained broad policies over the first 40 nominal DLC updates exposed a large actual first-command gap even though the offline solution agrees across masses. The retained policy's mean absolute first steering is 0.02445 rad, compared with 0.5 rad for the bounded offline solution, with mean absolute command difference 0.47555 rad in each mass group. The command differences drop to 0.00142–0.00649 rad at update 20. This identifies a weak early control response in the retained policy. The same stronger action cannot be assumed to preserve delayed behavior because the initial observed delay can be zero under both nominal and delayed protocols. These benchmark traces are diagnostic only.
+
+## Initial-transient tuning
+
+The transient mode starts from the retained broad checkpoints and fits additional actor-head directions from existing state and observed-delay channels during larger lateral errors. Its calibration objective gives priority to nominal RMSE and requires retention of all eight existing calibration wins and all 504 episodes.
+
+```bash
+python followup/tune_head.py followup/calibration/matched_mpc.csv followup/replay_transient transient
+python followup/score.py test followup/replay_transient followup/replay_transient
+python followup/score.py heldout followup/replay_transient followup/replay_transient --mpc followup/heldout/matched_mpc.csv
+python followup/steering_gap.py followup/replay_transient followup/replay_transient/nominal_dlc_steering_gap.csv
+```
+
+The candidate reduced original-benchmark nominal RMSE by 32.31% for slalom, 5.53% for 2200 kg DLC, and 2.79% for 1650 kg DLC compared with the broad candidate. The 1100 kg DLC nominal error rose 3.65%. Nominal DLC first steering magnitude moved only from 0.02445 to 0.02486 rad on average. All six nominal conditions were still behind MPC. The candidate lost mixed step on the benchmark and placed first in 6/14 with mean rank 1.643. It placed first in 8/14 on independent replay with mean rank 1.500. Both runs completed all 420 episodes. The broad checkpoints remain the benchmark leader by first-place count.
+
+The first-command-conditioned diagnostic (`python followup/first_action_bound.py`) fixes the retained broad policy's actual first steering command in every nominal benchmark episode, relaxes subsequent steering to any bounded sequence, and computes the same 40-update lower bound. Every one of the six mean RMSE bounds exceeds matched MPC. The excess is roughly 13.5–17.6%. Consequently, changing only the subsequent actions while keeping those first commands cannot win any nominal condition on this benchmark. A viable candidate needs a materially different initial response, followed by a delayed-case replay to check the trade-off.
+
+## First-command amplitude sweep
+
+The initial mode upweights calibration reset states and fits two steering-strength directions into the existing output heads. It evaluates an explicit gain grid on calibration before local search. The calibration selection rule retains all eight delayed wins and all 504 completions. Several larger corrections violated those requirements. For example, the first direction at coefficient 0.2 completed 437/504 and won zero conditions. The selected coefficient was only 0.00149 on the first direction. It increased the benchmark absolute initial command from 0.02445 to 0.02482 rad on average across nominal DLC cases, still far below the 0.5 rad offline reference.
+
+```bash
+python followup/tune_head.py followup/calibration/matched_mpc.csv followup/replay_initial initial
+python followup/score.py test followup/replay_initial followup/replay_initial
+python followup/score.py heldout followup/replay_initial followup/replay_initial --mpc followup/heldout/matched_mpc.csv
+```
+
+The selected fixed actor set ranked first in all eight delayed conditions on both the benchmark and the independent replay, with 420/420 completions in each. Mixed DLC became the eighth benchmark win by a narrow margin. The same candidate still trails matched MPC in all six no-delay conditions.
+
+The repository's original scalar evaluator independently reproduced the 8/14 benchmark win count and all 420 completions. The initial-mode checkpoints supersede the broad checkpoints by benchmark win count. Earlier artifacts remain saved.
+
+The amplitude diagnostic (`python followup/first_action_bound.py --sweep`) starts from the eight-win checkpoints and interpolates their initial command toward the independently optimized prefix command. For the four nominal 1650 kg conditions, 97.5% interpolation still leaves a 0.172–0.186% RMSE lower-bound deficit to MPC, even granting optimal later commands. At 100% interpolation the lower bound falls just below MPC. The two off-nominal DLC cases clear the bound at the 95% grid point. These are diagnostic results for this interpolation family on the original benchmark and were not used to choose or train a checkpoint.
+
+The nominal handoff diagnostic (`python followup/nominal_handoff.py`) replays 0, 1, 5, 20, or 40 bounded offline steering commands before returning control to the retained eight-win policy. The single-command replacement improves RMSE by 5.83–22.46% across the six nominal cases while all six remain behind MPC. Even 40 optimized commands followed by the retained policy leave the 1650 kg sine case 9.8% above MPC and nominal slalom 161% above. Both off-mass DLC cases still exceed four times MPC's RMSE. All diagnostic episodes completed. Thus learning only an initial response would leave a substantial tracking gap. The oracle prefix is diagnostic and does not form a candidate controller.
+
+## Late-tracking head update
+
+The tail mode starts from the eight-win checkpoints and fits output-head directions for small-error, low-observed-delay states. Its calibration loss emphasizes the nominal RMSE after update 40 and penalizes increases in total nominal RMSE. Selection retained all eight delayed calibration wins and 504/504 completions. The benchmark candidate reduced no-delay slalom RMSE by 24.85% and 2200 kg DLC by 4.56%, while 1100 kg DLC regressed by 2.56%. All six no-delay cases stayed behind MPC, and mixed DLC dropped to second. The candidate achieved 7/14 benchmark and 8/14 independent first places, both with 420/420 completions. The initial-mode policy set remains the retained eight-win checkpoint.
+
+Replay with `python followup/tune_head.py followup/calibration/matched_mpc.csv followup/replay_tail tail` and the standard follow-up scoring commands.
+
+## Actor-weight interpolation
+
+`interpolate_actor.py` mixes the initial-mode actor's hidden and output weights toward the 400-update constrained-distillation actor. The 0%, 0.5%, 2%, 5%, and 12% fractions each completed all 504 calibration episodes. The 5% and 12% fractions lost two delayed wins each. The 2% fraction retained all eight wins and cut all six nominal calibration RMSE values, with a geometric mean reduction of 0.832%. It was selected on calibration. Benchmark and independent replay each reproduced 8/14 first, all eight delayed wins, and 420/420 completions. The six nominal cases all remained behind MPC. Earlier eight-win checkpoints are preserved.
+
+The reset-only diagnostic replay uses `score.py calibration` with `--diagnostic-first-action` at 0.1, 0.3 and 1.0. It interpolates the retained actor's residual action toward saturated steering opposite the observed lateral error only at the first update, then resumes the unmodified retained policy. It never consults the delay mode. All runs completed 504/504 calibration episodes. The three strengths retained 6, 6 and 5 first-place results, respectively, compared with eight for the untouched actor. No nominal condition became first. The diagnostic shows that changing only the reset command can lose delayed wins even with full completion. It does not rule out a jointly redesigned transient and recovery policy. No diagnostic intervention was deployed or advanced to the benchmark.
+
+The joint recovery mode (`python followup/tune_head.py followup/calibration/matched_mpc.csv followup/replay_recovery recovery`) starts from the retained eight-win actor and adds output-head directions for both stronger reset steering and recovery when delay is observable. The best admissible calibration update barely adjusted the reset directions and retained all eight delayed wins and 504/504 episodes. It ranked first in 7/14 benchmark and 8/14 independent conditions with 420/420 completions in each. No nominal condition ranked first. The new checkpoint is retained as a trial, with the previous eight-win result kept as the benchmark leader.
+
+The 200 ms feasibility probe (`python followup/fixed_delay_ceil.py`) fixes a saturated initial command opposite initial lateral error, allows exact future reference in an offline QP, and replays the resulting command sequence through the original 200 ms FIFO. The four conditions each completed 10/10 physical cases and were below the strongest frozen comparator by 80–95%. The applied steering agreed with the planned sequence to within 1.2e-16 rad. This provides a feasible offline sequence under the original steering and queue constraints. It does not grant the actor future information.
+
+The joint distillation trial (`python followup/distill.py SEED --joint-expert`, for seeds 72, 73 and 74) trains on constrained nominal and 200 ms labels with mixed-delay imitation of the retained actor on separate training cases. The 100, 400 and 1000 update snapshots won 0, 0 and 1 of 14 calibration conditions, completing 359, 357 and 356 of 504 episodes. None qualified for benchmark replay. The retained actor and original comparator artifacts are unchanged.
+
+## Guarded offline distillation
+
+Train with `python followup/distill.py SEED --joint-guarded` for seeds 72, 73, and 74. Training rolls out the retained actor on separate training cases and keeps the main state distribution close to that actor. Nominal labels move 2.5% toward the offline command, 200 ms labels move 1%, and mixed-delay labels remain identical to the retained actor. The update uses a tenfold smaller step size than the full joint-distillation trial and leaves the deployment architecture and signal set intact.
+
+At 50, 200, and 600 updates the models completed all 504 calibration episodes and won 5, 7, and 8 conditions, respectively. The 600-update checkpoint qualified for benchmark and independent replay and won all eight delayed conditions on both, with 420/420 completions each. Compared with the verified initial-mode policy set, its geometric mean nominal RMSE fell 21.2% on the benchmark and 15.2% on independent replay, with improvements in all six cases on both. The 2200 kg DLC condition moved from third to second on the benchmark. All six still trailed the frozen matched MPC. Training checkpoints and benchmark/held-out episodes are retained in `guarded_distilled`.
+
+The original repository evaluator separately confirmed all eight delayed benchmark wins and 420/420 completions for the guarded 600-update checkpoints. These are retained alongside the previous eight-win checkpoint.
+
+## Second guarded pass
+
+`distill.py --guard-round-2` starts from the guarded 600-update checkpoints and uses fresh physical training seeds 22503–22505 with two different reference scales. At 200, 600, and 1200 updates all 504 calibration episodes completed, but mixed DLC, sine, and step lost to PPO at each snapshot. Interpolating from the first pass toward the second 600-update actor with `interpolate_actor.py --round2` preserved all eight calibration wins at fractions 0.10 and 0.25. The 0.50 fraction preserved seven. The 0.25 fraction was selected by the best nominal improvement among qualifying calibration candidates. It lowered geometric mean nominal RMSE by 4.18% on the benchmark and 2.74% on independent replay, with reductions in every nominal case. Both completed 420/420. The benchmark retained all eight delayed wins, while independent replay lost mixed sine. No nominal condition placed first. The first guarded pass remains the retained policy with eight wins on both replays.
+
+The prespecified 0.10 second-pass blend achieved 8/14 first and 420/420 completions on both the benchmark and the previously reported independent split. Compared with the first guarded pass, geometric mean nominal RMSE improved 1.76% on the benchmark and 1.15% on that independent split. An additional confirmation split fixed seeds 23080–23084 and scales (0.94, 1.07) and (1.10, 0.97) before running the frozen comparator suite and both candidates. Each candidate completed 420/420 and won the same five conditions: all four 200 ms cases and mixed slalom. Both lost mixed DLC, sine, and step to PPO. The 0.10 blend still improved geometric mean nominal RMSE by 2.33% on this split. The additional split makes the sensitivity of the three mixed-delay wins explicit. All evaluated checkpoints and outcomes remain saved.
+
+The original scalar evaluator confirmed the 0.10 blend's benchmark ranks. It won 14/14 in the repository's limited-PPO, fast-LQR, and original-MPC comparison and 8/14 in the objective-matched-MPC comparison required by the goal.
+
+## Nominal-focused distillation
+
+`distill.py --nominal-focus` starts from the 0.10 second-pass blend, uses physical training seeds 22506–22508, and increases the nominal offline label fraction from 2.5% to 5%. Mixed and 200 ms labels are held to the source actor. The 100, 400, and 1000 update snapshots completed all 504 calibration episodes but won only 4, 3, and 4 conditions. Interpolating from the source toward the 1000-update actor recovered all eight calibration wins at 5% and 15%. The 15% blend gave the better geometric mean nominal calibration improvement (2.44%) and was the only one evaluated on the replay suites.
+
+The 15% blend improved geometric mean nominal RMSE over the source by 3.46% on the benchmark, 2.56% on the original independent replay, and 4.58% on the confirmation split. It won 8/14, 7/14, and 5/14 respectively, completing 420/420 on all three. Mixed sine dropped to second on the original independent replay. All six benchmark nominal conditions remained behind matched MPC. The source with 8/14 on both original splits remains retained.
+
+## Mixed-delay offline labels
+
+`mixed_expert.py` encodes the original FIFO release-generation map as a sparse command matrix in the offline QP. In all 48 mixed calibration physical episodes, the simulator reproduced the resulting applied steering to within 5.6e-17 rad. Offline RMSE was 56–84% below frozen PPO across the four mixed conditions. The solver uses the full reference and future delay trace to make labels only.
+
+`distill.py --mixed-focus` trains from the retained 0.10 blend on separate physical seeds 22509–22511. It moves mixed-delay labels 4% toward the offline target on source-policy trajectories, anchoring the other labels to the source. All three snapshots preserved eight calibration wins and 504/504 completions. By aggregate calibration RMSE, the 1000-update snapshot was selected. It had 8/14, 8/14, and 5/14 first on benchmark, independent, and confirmation replays, all with 420/420 completions. Aggregate RMSE fell on all three, but geometric mean mixed RMSE rose by about 0.9–1.1% versus the retained actor. The same three mixed scenarios lost to PPO on confirmation, and no nominal condition won. The trial is saved alongside the prior retained checkpoints.
+
+The frozen-PPO teacher trial (`distill.py --ppo-mixed`) uses the paired equal-pretrained PPO's steering targets on separate seeds 22512–22514 and source trajectories, with a 12% label interpolation only for mixed-delay cases. The underlying PPO artifacts remain frozen. All three snapshots retained eight calibration wins and completed 504/504 episodes. Their worst mixed ratio to PPO was slightly worse than the source candidate on calibration. The 1000-update snapshot had the smallest worst mixed ratio among the tested snapshots and achieved 5/14 first and 420/420 complete on the previously reported confirmation split. It did not recover mixed DLC, sine, or step, and the original benchmark was not rerun for this trial.
+
+The stronger PPO teacher (`distill.py --ppo-mixed-strong`) uses fresh training seeds 22515–22517 and a 65% mixed target interpolation instead of 12%. The 100, 400, and 1000 snapshots completed 504/504 calibration episodes, winning 7, 7, and 8 conditions. The 1000-update snapshot advanced to confirmation. It completed 420/420 and won the same five conditions as the retained policy, with no new nominal or mixed-delay win. Benchmark and earlier independent replay were not rerun for this trial.
+
+## Direct nominal transient training
+
+`direct_transient.py` differentiates the first 60 no-delay updates of the discrete plant on training physical seeds 22518–22521 and two new reference scales. The hidden actor is frozen. The output head is updated against lateral squared error, with a steering-deviation penalty on retained-policy delayed trajectories. The training gradient treats preview quantization as a straight-through cast. Actual replays retain the original observation calculation, queue, and actuator constraints.
+
+All three snapshots won eight conditions on calibration and completed all 504 episodes. The 150-update snapshot cut geometric mean nominal calibration RMSE by 1.45% versus the retained actor and was selected for replay. It won 7/14 on the benchmark, 6/14 on independent replay, and 4/14 on confirmation. All three completed 420/420. No nominal condition won. The calibration improvement and action-deviation penalty did not protect the delayed wins on replay, so the previous checkpoint remains retained.
+
+## Direct FIFO transient training
+
+`direct_fifo.py` differentiates 120 simulated updates for each delay regime on training seeds 22522–22524. It uses the original command release-generation map, the causal observed-delay channels, the same saturation, and the same gain. Losses are normalized by source early-trajectory errors in each regime; the delayed losses receive an added penalty for regressions. An action-distance regularizer remains in the objective. The original scalar replay runs untouched.
+
+The 25, 60, and 100 update snapshots each achieved eight calibration wins and 504/504 completions. The 25-update snapshot had the lowest full-episode calibration RMSE. Its replays gave 8/14, 8/14, and 5/14 first on benchmark, independent, and confirmation, all at 420/420 completion. Whole-episode RMSE was slightly higher than the retained actor on all three replays. It gained no no-delay win and did not recover the three mixed-delay confirmation losses. The checksum-pinned retained candidate stays in place.
+
+With `direct_fifo.py --full-episode`, differentiable training covers all 1000 updates on separate seeds 22525–22527. The command gather uses a window determined by the maximum generation age and preserves the original FIFO indices. All snapshots won 8/14 on calibration and completed 504/504. The 35-update snapshot reduced aggregate calibration penalized RMSE by 17.1% relative to the retained actor and was selected for replay. It achieved 8/14, 8/14, and 5/14 first on the benchmark, independent, and confirmation splits, with 420/420 completions each. Geometric mean 200 ms RMSE fell by 22.74%, 19.97%, and 25.04%, respectively. Nominal RMSE rose by 2.45%, 1.28%, and 3.73%, and no additional first places were gained. This checkpoint is saved as a fixed-delay improvement trial. The checksum-pinned retained policy still has stronger nominal tracking.
+
+The full-episode nominal-priority variant (`direct_fifo.py --nominal-priority`) credits nominal and mixed improvement, removes the reward for further fixed-delay improvement, and penalizes any delayed regression above the source loss. The 8, 20, and 35 update snapshots each retained all eight delayed calibration wins and completed 504/504. Each increased RMSE in all six nominal calibration conditions relative to the retained checkpoint. Geometric mean nominal RMSE rose 0.71%, 0.97%, and 1.10%, respectively. No snapshot advanced to replay because the change failed its nominal objective.
+
+The projected variant (`direct_fifo.py --projected`) takes the nominal full-episode gradient plus the anchor regularizer and removes its projection onto both normalized delayed-loss gradients before each bounded output-head update. The construction makes the update neutral to the two delayed training losses to first order, without guaranteeing finite-step or replay behavior. Snapshots at 8, 16, and 24 updates completed all 504 calibration episodes and retained eight wins. The 24-update snapshot cut geometric mean nominal calibration RMSE by 1.00% and was selected. Replay ranks were 6/14 benchmark, 6/14 independent, and 5/14 confirmation, with 420/420 completions each. It won no nominal case and lost delayed wins on the first two splits. The previous retained checkpoint is unchanged.
+
+The full-actor projection (`direct_fifo.py --full-actor`) updates hidden and output weights in the fixed architecture. It lowered nominal training error, but finite steps caused large fixed-delay regressions. Calibration wins at 8, 16, and 24 updates were 1, 1, and 0, with 504, 498, and 498 completions. None advanced.
+
+The backtracking variant (`direct_fifo.py --line-search`) accepts a step only if the measured nominal training loss falls and both delayed training ratios stay at or below 1.01. Calibration recovered eight wins and 504/504 completions at every snapshot. The 24-update snapshot gave the largest nominal calibration gain (1.52%) and was selected. It won 5/14 on each of the benchmark, independent, and confirmation replays, all at 420/420 completions. No no-delay case placed first. The finite-step training guard did not preserve delayed performance outside the training distribution, so the checksum-pinned candidate remains retained.
+
+The condition-wise guard (`direct_fifo.py --condition-guard`) extends line search to all eight delayed condition losses separately on training physical seeds 22528–22532. It requires each delayed loss to stay within 1% of the source and nominal loss to decrease. Only 1, 0, and 3 updates were accepted for policy seeds 72, 73, and 74. The 8- and 16-update checkpoints were behaviorally identical in calibration and retained eight wins and 504/504 completions. Nominal calibration RMSE improved by only 0.089%. The earlier snapshot achieved 8/14, 8/14, and 5/14 across benchmark, independent, and confirmation, with 420/420 completions each. It gained no winner in the six nominal conditions. The checksum-pinned benchmark checkpoint is preserved.
+
+The condition-gradient variant (`direct_fifo.py --project-conditions`) projects onto the null space of all eight delayed condition gradients before applying the existing finite-step per-condition guard. It accepted 3, 0, and 5 steps for policy seeds 72, 73, and 74. The 5- and 10-update checkpoints were identical in calibration, with 8/14 first and 504/504 complete. The 5-update snapshot lowered nominal calibration RMSE by 0.80% and was selected for replay. It retained 8/14, 8/14, and 5/14 first in benchmark, independent, and confirmation, with 420/420 completions each. No nominal condition placed first. Artifacts are saved alongside the unchanged checksum-pinned checkpoint.
+
+The exploratory nominal-only branch (`direct_fifo.py --nominal-only`) starts from the retained policy and minimizes full-episode nominal squared error directly on fresh training seeds 22533–22537. It updates the full actor and omits delayed objectives and anchors during training. At 64 updates it reduced nominal training squared error by 46–47% across the three policy seeds. All three snapshots were evaluated against the full calibration protocol. Across the snapshots there were no nominal winners, and delayed completion regressed substantially. No candidate met the calibration gate for replay. The nominal-only branch and the prior retained checkpoint are both preserved.
+
+The second nominal-only stage (`direct_fifo.py --nominal-continue`) uses fresh training seeds 22538–22542 and starts from the first nominal-only 64-update weights. A further 64 updates reduce geometric mean nominal calibration RMSE 6.84% relative to the first nominal-only stage. All six nominal RMSE values remain 1.43–1.54 times the matched MPC values, and overall calibration completion falls to 345/504 with zero first places. The extension did not advance to replay. Both exploratory stages and the 8/14 retained actor remain saved.
+
+`nominal_transfer.py` uses the extended nominal-only actor as a target only on nominal training trajectories from seeds 22543–22545. Nominal targets interpolate 25% toward that actor. Delayed targets and all rollouts come from the checksum-pinned source. The 400-update snapshot kept all eight calibration wins and 504/504 completions. On replay it won 5/14, 6/14 and 5/14 across benchmark, independent and confirmation. It completed 420/420 episodes on each and added no nominal win. The source remains retained.
+
+Actor interpolation toward the nominal-transfer 400-update snapshot (`interpolate_actor.py --nominal-transfer`) preserved all eight calibration wins and 504/504 completions at 10%, 25%, and 50%. The 50% fraction had the largest nominal calibration improvement (3.11%) and was selected. Replay produced 8/14 benchmark, 7/14 independent, and 5/14 confirmation at 420/420 completions each. No nominal condition ranked first. The checksum-pinned checkpoint remains retained because it preserves eight wins on both original splits.
+
+The prespecified 25% nominal-transfer interpolation was also replayed. It scored 8/14, 7/14, and 5/14 with 420/420 completions each. Like the 50% blend, it lost mixed sine on the first independent replay and gained no nominal first place. It remains saved as a trial. The retained checksum-pinned actor and frozen comparator evidence are unchanged.
+
+The 10% nominal-transfer blend completed the interpolation sweep. It achieved 8/14, 7/14, and 5/14 with 420/420 completions across the benchmark, independent, and confirmation splits. All three tested nonzero blends lose mixed sine on the earlier independent split. The comparison CSV records the margins and nominal RMSE trade-off across the retained starting point, all three blends, and the full transfer actor. The retained actor remains unchanged.
+
+## Bounded nominal trajectory imitation
+
+`nominal_oracle_actor.py` starts from the extended nominal-only checkpoints and trains the full actor on fresh seeds 22546–22549 using bounded offline nominal trajectories and recovery labels on source-policy trajectories. Reset/transient observations are sampled more densely. No offline variables enter the deployed observation. The 1000- and 2400-step snapshots reduced nominal calibration RMSE by about 31% compared with the extended nominal-only policy. Their casewise RMSE values were 1.004–1.065× and 1.005–1.043× matched MPC, respectively. Each completed 216/216 nominal calibration episodes, with none of the 288 delayed episodes completing. They won zero nominal conditions. The narrower nominal gap identifies a separate source of training targets; these snapshots are not eligible for benchmark replay or replacement of the retained eight-win checkpoint.

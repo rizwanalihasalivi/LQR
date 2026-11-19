@@ -1,0 +1,17 @@
+{
+  "source": "guarded_round2/blend_.1/policy_72.zip",
+  "training_cases": [
+    22515,
+    22516,
+    22517
+  ],
+  "samples": 19320,
+  "nominal_samples": 8280,
+  "updates": 1000,
+  "fixed_delay_expert": false,
+  "mixed_delay_expert": false,
+  "frozen_ppo_teacher": true,
+  "ppo_label_fraction": 0.65,
+  "guarded_labels": true,
+  "scope": "Offline supervised revision of the existing PPO-trained actor."
+}
