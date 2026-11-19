@@ -52,8 +52,14 @@ extern "C" void replay(int cases, int horizon, int steps, int lag, int hinges,
                     if (apply_tail) correction += tail[i+7]*hinge;
                 }
                 if (apply_tail) {
-                    const double gate = .25 * (1. - std::abs(state[0])/tail[21]);
-                    command += 1.5 * (std::max(gate+correction/1.5,0.)-std::max(gate,0.));
+                    if (tail[21] < 0.) {
+                        const double threshold = -tail[21];
+                        command += std::max(correction-threshold,0.) -
+                                   std::max(-correction-threshold,0.);
+                    } else {
+                        const double gate = .25 * (1. - std::abs(state[0])/tail[21]);
+                        command += 1.5 * (std::max(gate+correction/1.5,0.)-std::max(gate,0.));
+                    }
                 }
                 if (t == 0 && lag) command = base + (authority/1.5)*(command-base);
                 u = base + std::clamp(command-base, -authority, authority);
