@@ -16,15 +16,15 @@ TRAINING_SEEDS = [22522, 22523, 22524]
 SCALES = [(.88, 1.02), (1.15, .98)]
 
 
-def main(seed, full_episode=False, nominal_priority=False, projected=False, full_actor=False, line_search=False, condition_guard=False, project_conditions=False, unconstrained_nominal=False, nominal_continue=False, nominal_polish=False, nominal_rmse=False):
-    nominal_polish = nominal_polish or nominal_rmse
+def main(seed, full_episode=False, nominal_priority=False, projected=False, full_actor=False, line_search=False, condition_guard=False, project_conditions=False, unconstrained_nominal=False, nominal_continue=False, nominal_polish=False, nominal_rmse=False, anchor_nominal=False):
+    nominal_polish = nominal_polish or nominal_rmse or anchor_nominal
     unconstrained_nominal = unconstrained_nominal or nominal_continue or nominal_polish
     condition_guard = condition_guard or project_conditions
     line_search = line_search or condition_guard
     full_actor = full_actor or line_search
     projected = projected or full_actor
     full_episode = full_episode or nominal_priority or projected or unconstrained_nominal
-    horizon = 1000 if full_episode else HORIZON
+    horizon = 360 if anchor_nominal else (1000 if full_episode else HORIZON)
     torch.set_num_threads(1)
     source = HERE / "guarded_round2" / "blend_.1" / f"policy_{seed}.zip"
     if nominal_continue:
@@ -33,6 +33,8 @@ def main(seed, full_episode=False, nominal_priority=False, projected=False, full
         source = HERE / "nominal_oracle_actor" / f"policy_{seed}_2400.zip"
     if nominal_rmse:
         source = HERE / "direct_fifo_nominal_polish" / f"policy_{seed}_48.zip"
+    if anchor_nominal:
+        source = HERE / "anchor_corrected_transfer" / f"policy_{seed}_300.zip"
     model = PPO.load(source, device="cpu")
     predict = actor(model)
     seeds = [22525, 22526, 22527] if full_episode else TRAINING_SEEDS
@@ -52,7 +54,11 @@ def main(seed, full_episode=False, nominal_priority=False, projected=False, full
     if nominal_rmse:
         seeds = [22569, 22570, 22571, 22572, 22573, 22574]
         scales = [(.89, .96), (1.13, 1.07)]
-    cases = build_cases(seeds, scales)
+    if anchor_nominal:
+        seeds = [22596, 22597, 22598, 22599]
+        scales = [(.89, 1.06), (1.13, .95)]
+    training_cases = build_cases(seeds, scales)
+    cases = training_cases
     if unconstrained_nominal:
         cases = [case for case in cases if case["delay"] == "none"]
     data = prepare(cases)
@@ -99,7 +105,7 @@ def main(seed, full_episode=False, nominal_priority=False, projected=False, full
     head = model.policy.action_net
 
     observations = []
-    for case in cases:
+    for case in training_cases if anchor_nominal else cases:
         if case["delay"] == "none":
             continue
         env = make_env(case)
@@ -138,7 +144,7 @@ def main(seed, full_episode=False, nominal_priority=False, projected=False, full
             state = torch.einsum("nij,nj->ni", transition, state) + steer * applied[:, None]
             state = state + disturbances[tick]
             loss = loss + state[:, 0].square()
-        if nominal_rmse:
+        if nominal_rmse or anchor_nominal:
             return mode_weights @ ((loss + initial[:, 0].square()) / (horizon + 1)).sqrt()
         return mode_weights @ (loss / horizon)
 
@@ -171,6 +177,8 @@ def main(seed, full_episode=False, nominal_priority=False, projected=False, full
         out = HERE / "direct_fifo_nominal_polish"
     if nominal_rmse:
         out = HERE / "direct_fifo_nominal_rmse"
+    if anchor_nominal:
+        out = HERE / "anchor_closed_loop"
     out.mkdir(exist_ok=True)
     checkpoints = (8, 20, 35) if full_episode else (25, 60, 100)
     if projected:
@@ -187,7 +195,21 @@ def main(seed, full_episode=False, nominal_priority=False, projected=False, full
         checkpoints = (8, 24, 48)
     if nominal_rmse:
         checkpoints = (24, 64, 128)
-    weights = tuple(head.parameters())
+    if anchor_nominal:
+        checkpoints = (8, 24, 48)
+        from torch.func import functional_call, jacrev, vmap
+        network = torch.nn.Sequential(hidden, head)
+        named = dict(network.named_parameters())
+        random = torch.Generator().manual_seed(seed)
+        reference = PPO.load(HERE / "guarded_round2" / "blend_.1" / f"policy_{seed}.zip", device="cpu")
+        with torch.no_grad():
+            anchor_reference = reference.policy.action_net(
+                reference.policy.mlp_extractor.policy_net(anchor_obs)
+            ).squeeze(-1)
+        def steer_at(weights, observation):
+            return functional_call(network, weights, (observation,)).squeeze(-1)
+        delayed_jacobian = vmap(jacrev(steer_at), in_dims=(None, 0))
+    weights = tuple(named.values()) if anchor_nominal else tuple(head.parameters())
     if full_actor:
         weights += tuple(hidden.parameters())
     accepted_steps = 0
@@ -202,7 +224,24 @@ def main(seed, full_episode=False, nominal_priority=False, projected=False, full
             loss = ratios[3:].mean() if nominal_polish else ratios[0] + .25 * ratios[1] + 4 * delayed_regression.sum() + 2000 * drift
         if unconstrained_nominal:
             loss = ratios[3:].mean() if nominal_polish else ratios[0]
-        if projected:
+        if anchor_nominal:
+            sample = torch.randint(len(anchor_obs), (96,), generator=random)
+            observation = anchor_obs[sample]
+            matrices = delayed_jacobian(named, observation)
+            rows = torch.cat([m.reshape(len(sample), -1) for m in matrices.values()], dim=1).detach()
+            values, vectors = torch.linalg.eigh(rows @ rows.T)
+            keep = values > max(1e-7, float(values[-1]) * 1e-6)
+            basis = (vectors[:, keep].T @ rows) / values[keep].sqrt()[:, None]
+            gradient = torch.cat([g.flatten() for g in torch.autograd.grad(loss, weights)])
+            direction = gradient - basis.T @ (basis @ gradient)
+            direction = direction * (.0005 / direction.norm().clamp_min(1e-12))
+            with torch.no_grad():
+                residual = network(observation).squeeze(-1) - anchor_reference[sample]
+                correction = basis.T @ ((vectors[:, keep].T @ residual) / values[keep].sqrt())
+                direction = direction + min(.25, .0005 / max(float(correction.norm()), 1e-12)) * correction
+                for parameter, update in zip(weights, direction.split([p.numel() for p in weights]), strict=True):
+                    parameter.sub_(update.reshape_as(parameter))
+        elif projected:
             constraints = ratios[3:] if project_conditions else ratios[1:3]
             delayed = torch.stack([
                 torch.cat([g.flatten() for g in torch.autograd.grad(ratio, weights, retain_graph=True)])
@@ -257,5 +296,6 @@ if __name__ == "__main__":
     parser.add_argument("--nominal-continue", action="store_true")
     parser.add_argument("--nominal-polish", action="store_true")
     parser.add_argument("--nominal-rmse", action="store_true")
+    parser.add_argument("--anchor-nominal", action="store_true")
     args = parser.parse_args()
-    main(args.seed, args.full_episode, args.nominal_priority, args.projected, args.full_actor, args.line_search, args.condition_guard, args.project_conditions, args.nominal_only, args.nominal_continue, args.nominal_polish, args.nominal_rmse)
+    main(args.seed, args.full_episode, args.nominal_priority, args.projected, args.full_actor, args.line_search, args.condition_guard, args.project_conditions, args.nominal_only, args.nominal_continue, args.nominal_polish, args.nominal_rmse, args.anchor_nominal)
