@@ -4,8 +4,8 @@ from scipy import sparse
 import osqp
 from dynamic_env import plant
 class MatchedMPC:
- def __init__(self,N=20):
-  self.N=N;self.A,self.B,self.G,self.H=plant()
+ def __init__(self,N=20,*,mass=1650.,vx=25.):
+  self.N=N;self.vx=vx;self.A,self.B,self.G,self.H=plant(mass,vx)
   self.T=np.zeros((4*N,4));S=np.zeros((4*N,N))
   for k in range(N):
    self.T[4*k:4*k+4]=np.linalg.matrix_power(self.A,k+1)
@@ -19,7 +19,7 @@ class MatchedMPC:
  def action(self,e):
   x=np.zeros(4);stack=[]
   for j in range(self.N):
-   k=min(e.k+j,e.ref.shape[1]-1);x=self.A@x+self.G*(e.ref[2,k]/25)+self.H*(e.ref[3,k]/25);stack.extend(x)
+   k=min(e.k+j,e.ref.shape[1]-1);x=self.A@x+self.G*(e.ref[2,k]/self.vx)+self.H*(e.ref[3,k]/self.vx);stack.extend(x)
   c=self.SW@(self.T@e.x+np.asarray(stack));c[0]-=.01*e.prev_u
   u=-self.inv@c
   if np.max(abs(u))>.5:
