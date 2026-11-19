@@ -1,0 +1,45 @@
+{
+  "source": "direct_fifo_nominal_polish/policy_72_48.zip",
+  "training_seeds": [
+    22600,
+    22601,
+    22602,
+    22603,
+    22604,
+    22605
+  ],
+  "scales": [
+    [
+      0.9,
+      1.04
+    ],
+    [
+      1.12,
+      0.96
+    ]
+  ],
+  "baseline_nominal_rmse": 0.000821584319046518,
+  "snapshots": [
+    {
+      "step": 4,
+      "nominal_rmse": 0.0008206173370106172,
+      "completed": 72,
+      "accepted": true,
+      "damping": 4.0960000000000014e-05
+    },
+    {
+      "step": 12,
+      "nominal_rmse": 0.0008193640143292634,
+      "completed": 72,
+      "accepted": true,
+      "damping": 6.871947673600006e-05
+    },
+    {
+      "step": 24,
+      "nominal_rmse": 0.0008185580787762759,
+      "completed": 72,
+      "accepted": false,
+      "damping": 4.722366482869651
+    }
+  ]
+}

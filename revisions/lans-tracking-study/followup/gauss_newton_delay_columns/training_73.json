@@ -1,0 +1,43 @@
+{
+  "source": "gauss_newton_bias/policy_73_12.zip",
+  "training_seeds": [
+    22710,
+    22711,
+    22712,
+    22713,
+    22714,
+    22715
+  ],
+  "scales": [
+    [
+      0.91,
+      1.01
+    ],
+    [
+      1.13,
+      0.96
+    ]
+  ],
+  "phase_weighted": true,
+  "margin_guard": true,
+  "protects_nominal_conditions": true,
+  "fits_first_layer_bias": true,
+  "fits_delay_columns": true,
+  "baseline_nominal_rmse": 0.0026517606487280318,
+  "snapshots": [
+    {
+      "step": 3,
+      "nominal_rmse": 0.0026193528182319984,
+      "completed": 168,
+      "accepted": true,
+      "damping": 5.120000000000001e-05
+    },
+    {
+      "step": 8,
+      "nominal_rmse": 0.0025919377768266957,
+      "completed": 168,
+      "accepted": false,
+      "damping": 0.0001677721600000001
+    }
+  ]
+}

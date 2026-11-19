@@ -1,0 +1,54 @@
+{
+  "source": "delay_channel_recovery/policy_74_6000.zip",
+  "seeds": [
+    22697,
+    22698,
+    22699,
+    22700,
+    22701
+  ],
+  "scales": [
+    [
+      0.9,
+      0.96
+    ],
+    [
+      1.14,
+      1.07
+    ]
+  ],
+  "beta_decay_per_ms": 0.008,
+  "horizon": 200,
+  "snapshots": [
+    {
+      "step": 64,
+      "delay_fraction": 0.5,
+      "training_gain": 0.018,
+      "training_mse": [
+        1.3702486431731987e-06,
+        0.00040695580969299925,
+        0.08725962062152355
+      ]
+    },
+    {
+      "step": 96,
+      "delay_fraction": 0.75,
+      "training_gain": 0.012,
+      "training_mse": [
+        1.3721899917625338e-06,
+        0.4475925517548004,
+        0.2303631269960559
+      ]
+    },
+    {
+      "step": 128,
+      "delay_fraction": 1.0,
+      "training_gain": 0.008,
+      "training_mse": [
+        1.3834028662196231e-06,
+        2.7883045511111297,
+        0.896537518375932
+      ]
+    }
+  ]
+}

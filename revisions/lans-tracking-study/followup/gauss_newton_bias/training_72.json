@@ -1,0 +1,44 @@
+{
+  "source": "gauss_newton_margin/policy_72_24.zip",
+  "training_seeds": [
+    22702,
+    22703,
+    22704,
+    22705,
+    22706,
+    22707,
+    22708,
+    22709
+  ],
+  "scales": [
+    [
+      0.89,
+      0.97
+    ],
+    [
+      1.16,
+      1.04
+    ]
+  ],
+  "phase_weighted": true,
+  "margin_guard": true,
+  "protects_nominal_conditions": true,
+  "fits_first_layer_bias": true,
+  "baseline_nominal_rmse": 0.004691664561030385,
+  "snapshots": [
+    {
+      "step": 4,
+      "nominal_rmse": 0.004606747122581688,
+      "completed": 224,
+      "accepted": true,
+      "damping": 4.0960000000000014e-05
+    },
+    {
+      "step": 12,
+      "nominal_rmse": 0.0044970656922731075,
+      "completed": 224,
+      "accepted": true,
+      "damping": 6.871947673600006e-05
+    }
+  ]
+}

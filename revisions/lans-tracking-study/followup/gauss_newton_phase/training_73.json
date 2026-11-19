@@ -1,0 +1,48 @@
+{
+  "source": "gauss_newton_joint/policy_73_12.zip",
+  "training_seeds": [
+    22630,
+    22631,
+    22632,
+    22633,
+    22634,
+    22635,
+    22636,
+    22637
+  ],
+  "scales": [
+    [
+      0.88,
+      1.03
+    ],
+    [
+      1.15,
+      0.97
+    ]
+  ],
+  "phase_weighted": true,
+  "baseline_nominal_rmse": 0.0046035710542843,
+  "snapshots": [
+    {
+      "step": 4,
+      "nominal_rmse": 0.0045993718371128,
+      "completed": 224,
+      "accepted": true,
+      "damping": 4.0960000000000014e-05
+    },
+    {
+      "step": 12,
+      "nominal_rmse": 0.004595555275173369,
+      "completed": 224,
+      "accepted": true,
+      "damping": 6.871947673600006e-05
+    },
+    {
+      "step": 24,
+      "nominal_rmse": 0.004594602473771299,
+      "completed": 224,
+      "accepted": false,
+      "damping": 47.223664828696506
+    }
+  ]
+}

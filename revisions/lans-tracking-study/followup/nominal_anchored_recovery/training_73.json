@@ -1,0 +1,49 @@
+{
+  "source": "delay_channel_recovery/policy_73_6000.zip",
+  "nominal_anchor": "nominal_oracle_precision/policy_73_4000.zip",
+  "delayed_teacher": "gauss_newton_joint/policy_73_12.zip",
+  "training_seeds": [
+    22676,
+    22677,
+    22678,
+    22679,
+    22680,
+    22681
+  ],
+  "scales": [
+    [
+      0.89,
+      1.02
+    ],
+    [
+      1.14,
+      0.98
+    ]
+  ],
+  "history": [
+    {
+      "step": 200,
+      "losses": [
+        0.7382388114929199,
+        0.2379133254289627
+      ],
+      "nominal_anchor_mse": 1.1655529306153767e-06
+    },
+    {
+      "step": 800,
+      "losses": [
+        1.2465676069259644,
+        0.1106567531824112
+      ],
+      "nominal_anchor_mse": 1.2159823654656066e-06
+    },
+    {
+      "step": 1600,
+      "losses": [
+        0.7280410528182983,
+        0.17533645033836365
+      ],
+      "nominal_anchor_mse": 2.4156287636856177e-08
+    }
+  ]
+}

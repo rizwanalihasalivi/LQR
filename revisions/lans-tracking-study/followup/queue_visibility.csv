@@ -1,0 +1,13 @@
+split,path,episodes,ticks,pending_queue_ticks,zero_observed_delay_pending_ticks,unattenuated_pending_ticks,episodes_with_unattenuated_pending
+calibration,dlc,12,12000,5696,104,94,12
+calibration,sine,12,12000,5696,104,94,12
+calibration,slalom,12,12000,5696,104,94,12
+calibration,step,12,12000,5696,104,94,12
+confirmation,dlc,10,10000,4844,104,98,10
+confirmation,sine,10,10000,4844,104,98,10
+confirmation,slalom,10,10000,4844,104,98,10
+confirmation,step,10,10000,4844,104,98,10
+heldout,dlc,10,10000,4604,84,74,10
+heldout,sine,10,10000,4604,84,74,10
+heldout,slalom,10,10000,4604,84,74,10
+heldout,step,10,10000,4604,84,74,10

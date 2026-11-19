@@ -1,0 +1,8 @@
+{
+  "beta_decay_per_ms": 0.008,
+  "checkpoints": [
+    "followup/delay_curriculum_intermediate_gain/policy_72_64.zip",
+    "followup/delay_curriculum_intermediate_gain/policy_73_64.zip",
+    "followup/delay_curriculum_intermediate_gain/policy_74_64.zip"
+  ]
+}

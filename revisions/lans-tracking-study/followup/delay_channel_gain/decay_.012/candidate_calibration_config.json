@@ -1,0 +1,8 @@
+{
+  "beta_decay_per_ms": 0.012,
+  "checkpoints": [
+    "followup/delay_channel_recovery/policy_72_6000.zip",
+    "followup/delay_channel_recovery/policy_73_6000.zip",
+    "followup/delay_channel_recovery/policy_74_6000.zip"
+  ]
+}

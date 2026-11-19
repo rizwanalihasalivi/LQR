@@ -1,0 +1,45 @@
+{
+  "source": "anchor_closed_loop/policy_72_24.zip",
+  "training_seeds": [
+    22600,
+    22601,
+    22602,
+    22603,
+    22604,
+    22605
+  ],
+  "scales": [
+    [
+      0.9,
+      1.04
+    ],
+    [
+      1.12,
+      0.96
+    ]
+  ],
+  "baseline_nominal_rmse": 0.002138676013682684,
+  "snapshots": [
+    {
+      "step": 4,
+      "nominal_rmse": 0.002092624478425203,
+      "completed": 168,
+      "accepted": true,
+      "damping": 4.0960000000000014e-05
+    },
+    {
+      "step": 12,
+      "nominal_rmse": 0.0020808911163244927,
+      "completed": 168,
+      "accepted": true,
+      "damping": 0.06871947673600004
+    },
+    {
+      "step": 24,
+      "nominal_rmse": 0.0020805852449281344,
+      "completed": 168,
+      "accepted": true,
+      "damping": 47.223664828696506
+    }
+  ]
+}
