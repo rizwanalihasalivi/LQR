@@ -1,0 +1,41 @@
+{
+  "source": "guarded_round2/blend_.1/policy_72.zip",
+  "nominal_teacher": "direct_fifo_nominal_polish/policy_72_48.zip",
+  "training_seeds": [
+    22580,
+    22581,
+    22582,
+    22583
+  ],
+  "corrects_cumulative_anchor_drift": true,
+  "scales": [
+    [
+      0.91,
+      0.97
+    ],
+    [
+      1.14,
+      1.06
+    ]
+  ],
+  "snapshots": [
+    {
+      "step": 40,
+      "nominal_target_loss": 0.18888327479362488,
+      "max_local_anchor_drift": 0.0002841055393218994,
+      "anchor_rank": 75
+    },
+    {
+      "step": 120,
+      "nominal_target_loss": 0.20867565274238586,
+      "max_local_anchor_drift": 0.00027242302894592285,
+      "anchor_rank": 73
+    },
+    {
+      "step": 300,
+      "nominal_target_loss": 0.2052069753408432,
+      "max_local_anchor_drift": 0.000172443687915802,
+      "anchor_rank": 85
+    }
+  ]
+}

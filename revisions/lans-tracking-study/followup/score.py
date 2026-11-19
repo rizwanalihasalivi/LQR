@@ -15,7 +15,7 @@ from batch_sim import build_cases
 from calibration import ADDITIONAL_SPLITS
 
 
-def score(paths, stage, mpc_path, destination, first_action_fraction=0.):
+def score(paths, stage, mpc_path, destination, first_action_fraction=0., beta_decay=None):
     references = STUDY / "results" / stage
     names = ("lans", "ppo", "lqr", "mpc")
     rows = []
@@ -33,6 +33,8 @@ def score(paths, stage, mpc_path, destination, first_action_fraction=0.):
             config = dict(case)
             config["seed"] = config.pop("physical_seed")
             env = make_env(config)
+            if beta_decay is not None:
+                env.beta_decay = beta_decay
             obs, _ = env.reset(seed=config["seed"])
             squared_error = float(env.x[0]) ** 2
             for tick in range(1000):
@@ -93,6 +95,10 @@ def score(paths, stage, mpc_path, destination, first_action_fraction=0.):
     (destination / ("candidate_" + stage + "_summary.json")).write_text(
         json.dumps(summary, indent=2) + "\n"
     )
+    if beta_decay is not None:
+        (destination / f"candidate_{stage}_config.json").write_text(
+            json.dumps({"beta_decay_per_ms": beta_decay, "checkpoints": [str(p) for p in paths]}, indent=2) + "\n"
+        )
     print(destination, stage, summary, flush=True)
 
 
@@ -105,7 +111,11 @@ if __name__ == "__main__":
     parser.add_argument("--mpc", type=Path)
     parser.add_argument("--diagnostic-first-action", type=float, default=0.,
                         help="At reset only, interpolate the legacy action toward saturated lateral correction.")
+    parser.add_argument("--beta-decay", type=float,
+                        help="Override the existing LANS exponential gain parameter for the candidate only.")
     args = parser.parse_args()
+    if args.beta_decay is not None and (not np.isfinite(args.beta_decay) or args.beta_decay < 0):
+        parser.error("--beta-decay must be finite and nonnegative")
     if not 0. <= args.diagnostic_first_action <= 1.:
         parser.error("--diagnostic-first-action must be in [0, 1]")
     if args.stage in ADDITIONAL_SPLITS and args.mpc is None:
@@ -113,4 +123,4 @@ if __name__ == "__main__":
     torch.set_num_threads(1)
     suffix = f"_{args.updates}" if args.updates else ""
     paths = [args.checkpoint_dir / f"policy_{seed}{suffix}.zip" for seed in POLICY_SEEDS]
-    score(paths, args.stage, args.mpc, args.output_dir, args.diagnostic_first_action)
+    score(paths, args.stage, args.mpc, args.output_dir, args.diagnostic_first_action, args.beta_decay)

@@ -16,8 +16,9 @@ TRAINING_SEEDS = [22522, 22523, 22524]
 SCALES = [(.88, 1.02), (1.15, .98)]
 
 
-def main(seed, full_episode=False, nominal_priority=False, projected=False, full_actor=False, line_search=False, condition_guard=False, project_conditions=False, unconstrained_nominal=False, nominal_continue=False):
-    unconstrained_nominal = unconstrained_nominal or nominal_continue
+def main(seed, full_episode=False, nominal_priority=False, projected=False, full_actor=False, line_search=False, condition_guard=False, project_conditions=False, unconstrained_nominal=False, nominal_continue=False, nominal_polish=False, nominal_rmse=False):
+    nominal_polish = nominal_polish or nominal_rmse
+    unconstrained_nominal = unconstrained_nominal or nominal_continue or nominal_polish
     condition_guard = condition_guard or project_conditions
     line_search = line_search or condition_guard
     full_actor = full_actor or line_search
@@ -28,6 +29,10 @@ def main(seed, full_episode=False, nominal_priority=False, projected=False, full
     source = HERE / "guarded_round2" / "blend_.1" / f"policy_{seed}.zip"
     if nominal_continue:
         source = HERE / "direct_fifo_nominal_only" / f"policy_{seed}_64.zip"
+    if nominal_polish:
+        source = HERE / "nominal_oracle_actor" / f"policy_{seed}_2400.zip"
+    if nominal_rmse:
+        source = HERE / "direct_fifo_nominal_polish" / f"policy_{seed}_48.zip"
     model = PPO.load(source, device="cpu")
     predict = actor(model)
     seeds = [22525, 22526, 22527] if full_episode else TRAINING_SEEDS
@@ -41,6 +46,12 @@ def main(seed, full_episode=False, nominal_priority=False, projected=False, full
     if nominal_continue:
         seeds = [22538, 22539, 22540, 22541, 22542]
         scales = [(.89, .97), (1.13, 1.05)]
+    if nominal_polish:
+        seeds = [22558, 22559, 22560, 22561, 22562, 22563]
+        scales = [(.88, 1.02), (1.16, .95)]
+    if nominal_rmse:
+        seeds = [22569, 22570, 22571, 22572, 22573, 22574]
+        scales = [(.89, .96), (1.13, 1.07)]
     cases = build_cases(seeds, scales)
     if unconstrained_nominal:
         cases = [case for case in cases if case["delay"] == "none"]
@@ -76,6 +87,13 @@ def main(seed, full_episode=False, nominal_priority=False, projected=False, full
             for path in ("dlc", "step", "sine", "slalom")
         ], dtype=torch.float64)
         modes = torch.cat((modes, delayed_masks))
+    if nominal_polish:
+        conditions = list(dict.fromkeys((case["path"], case["mass"]) for case in cases))
+        nominal_masks = torch.tensor([
+            [(case["path"], case["mass"]) == condition for case in cases]
+            for condition in conditions
+        ], dtype=torch.float64)
+        modes = torch.cat((modes, nominal_masks))
     mode_weights = modes / modes.sum(dim=1, keepdim=True).clamp_min(1.)
     hidden = model.policy.mlp_extractor.policy_net
     head = model.policy.action_net
@@ -120,12 +138,15 @@ def main(seed, full_episode=False, nominal_priority=False, projected=False, full
             state = torch.einsum("nij,nj->ni", transition, state) + steer * applied[:, None]
             state = state + disturbances[tick]
             loss = loss + state[:, 0].square()
+        if nominal_rmse:
+            return mode_weights @ ((loss + initial[:, 0].square()) / (horizon + 1)).sqrt()
         return mode_weights @ (loss / horizon)
 
     for parameter in hidden.parameters():
         parameter.requires_grad_(full_actor or unconstrained_nominal)
     if unconstrained_nominal:
-        optimizer = torch.optim.Adam([*hidden.parameters(), *head.parameters()], lr=.00025)
+        learning_rate = .00006 if nominal_rmse else (.000012 if nominal_polish else .00025)
+        optimizer = torch.optim.Adam([*hidden.parameters(), *head.parameters()], lr=learning_rate)
     else:
         optimizer = torch.optim.Adam(head.parameters(), lr=.00006 if nominal_priority else .000025)
     reference_loss = rollout().detach().clamp_min(1e-12)
@@ -146,6 +167,10 @@ def main(seed, full_episode=False, nominal_priority=False, projected=False, full
         out = HERE / "direct_fifo_nominal_only"
     if nominal_continue:
         out = HERE / "direct_fifo_nominal_extended"
+    if nominal_polish:
+        out = HERE / "direct_fifo_nominal_polish"
+    if nominal_rmse:
+        out = HERE / "direct_fifo_nominal_rmse"
     out.mkdir(exist_ok=True)
     checkpoints = (8, 20, 35) if full_episode else (25, 60, 100)
     if projected:
@@ -158,6 +183,10 @@ def main(seed, full_episode=False, nominal_priority=False, projected=False, full
         checkpoints = (8, 24, 64)
     if nominal_continue:
         checkpoints = (24, 64)
+    if nominal_polish:
+        checkpoints = (8, 24, 48)
+    if nominal_rmse:
+        checkpoints = (24, 64, 128)
     weights = tuple(head.parameters())
     if full_actor:
         weights += tuple(hidden.parameters())
@@ -170,9 +199,9 @@ def main(seed, full_episode=False, nominal_priority=False, projected=False, full
         loss = ratios.mean() + 2 * (ratios[1:] - 1).clamp_min(0).sum() + 5000 * drift
         if nominal_priority:
             delayed_regression = (ratios[1:] - 1).clamp_min(0)
-            loss = ratios[0] + .25 * ratios[1] + 4 * delayed_regression.sum() + 2000 * drift
+            loss = ratios[3:].mean() if nominal_polish else ratios[0] + .25 * ratios[1] + 4 * delayed_regression.sum() + 2000 * drift
         if unconstrained_nominal:
-            loss = ratios[0]
+            loss = ratios[3:].mean() if nominal_polish else ratios[0]
         if projected:
             constraints = ratios[3:] if project_conditions else ratios[1:3]
             delayed = torch.stack([
@@ -226,5 +255,7 @@ if __name__ == "__main__":
     parser.add_argument("--project-conditions", action="store_true")
     parser.add_argument("--nominal-only", action="store_true")
     parser.add_argument("--nominal-continue", action="store_true")
+    parser.add_argument("--nominal-polish", action="store_true")
+    parser.add_argument("--nominal-rmse", action="store_true")
     args = parser.parse_args()
-    main(args.seed, args.full_episode, args.nominal_priority, args.projected, args.full_actor, args.line_search, args.condition_guard, args.project_conditions, args.nominal_only, args.nominal_continue)
+    main(args.seed, args.full_episode, args.nominal_priority, args.projected, args.full_actor, args.line_search, args.condition_guard, args.project_conditions, args.nominal_only, args.nominal_continue, args.nominal_polish, args.nominal_rmse)

@@ -1,0 +1,53 @@
+{
+  "source": "joint_actor_recovery/policy_73_4000.zip",
+  "nominal_teacher": "nominal_oracle_actor/policy_73_2400.zip",
+  "delayed_teacher": "guarded_round2/blend_.1/policy_73.zip",
+  "training_seeds": [
+    22564,
+    22565,
+    22566,
+    22567,
+    22568
+  ],
+  "scales": [
+    [
+      0.92,
+      0.94
+    ],
+    [
+      1.14,
+      1.08
+    ]
+  ],
+  "samples_by_regime": [
+    28440,
+    17483,
+    17584
+  ],
+  "history": [
+    {
+      "update": 500,
+      "group_loss": [
+        0.1048947423696518,
+        0.02243894152343273,
+        0.006491752341389656
+      ]
+    },
+    {
+      "update": 1500,
+      "group_loss": [
+        0.08085201680660248,
+        0.019632838666439056,
+        0.008036110550165176
+      ]
+    },
+    {
+      "update": 3000,
+      "group_loss": [
+        0.11111834645271301,
+        0.019482702016830444,
+        0.007707631215453148
+      ]
+    }
+  ]
+}

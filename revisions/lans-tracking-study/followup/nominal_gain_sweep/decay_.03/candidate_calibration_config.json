@@ -1,0 +1,8 @@
+{
+  "beta_decay_per_ms": 0.03,
+  "checkpoints": [
+    "followup/nominal_oracle_actor/policy_72_2400.zip",
+    "followup/nominal_oracle_actor/policy_73_2400.zip",
+    "followup/nominal_oracle_actor/policy_74_2400.zip"
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "source": "guarded_round2/blend_.1/policy_73.zip",
+  "nominal_teacher": "direct_fifo_nominal_polish/policy_73_48.zip",
+  "training_seeds": [
+    22584,
+    22585,
+    22586,
+    22587
+  ],
+  "scales": [
+    [
+      0.9,
+      1.05
+    ],
+    [
+      1.14,
+      0.94
+    ]
+  ],
+  "fit_width": 30,
+  "delay_threshold": 0.001,
+  "samples_by_context": [
+    24784,
+    22704
+  ],
+  "snapshots": [
+    {
+      "step": 1500,
+      "losses": [
+        0.050864096730947495,
+        0.0006482331664301455
+      ]
+    },
+    {
+      "step": 4500,
+      "losses": [
+        0.03863242641091347,
+        0.0004709514032583684
+      ]
+    }
+  ]
+}
