@@ -30,6 +30,8 @@ def lower_bound(matrix, free, initial, commands, lock):
 def main():
     sources = {
         "retained_joint": ("gauss_newton_joint", 12),
+        "prefix_joint": ("anchor_prefix_focus", 150),
+        "slalom_anchored_joint": ("anchor_prefix_slalom", 480),
         "nominal_precision": ("nominal_oracle_precision", 4000),
         "receding_nominal": ("receding_nominal_targets", 5000),
     }

@@ -1,0 +1,51 @@
+{
+  "source": "anchor_prefix_focus/policy_73_150.zip",
+  "delayed_anchor": "anchor_prefix_focus/policy_73_150.zip",
+  "nominal_teacher": "bounded receding targets",
+  "training_seeds": [
+    23348,
+    23349,
+    23350,
+    23351,
+    23352,
+    23353,
+    23354,
+    23355
+  ],
+  "extra_nominal_reset_seeds": [
+    23300,
+    23347
+  ],
+  "fixed_slalom_anchor_samples": 2352,
+  "corrects_cumulative_anchor_drift": true,
+  "scales": [
+    [
+      0.9,
+      0.96
+    ],
+    [
+      1.14,
+      1.08
+    ]
+  ],
+  "snapshots": [
+    {
+      "step": 80,
+      "nominal_target_loss": 0.27229824662208557,
+      "max_local_anchor_drift": 0.00028780847787857056,
+      "anchor_rank": 108
+    },
+    {
+      "step": 230,
+      "nominal_target_loss": 0.26124441623687744,
+      "max_local_anchor_drift": 0.00014158478006720543,
+      "anchor_rank": 114
+    },
+    {
+      "step": 480,
+      "nominal_target_loss": 0.24858610332012177,
+      "max_local_anchor_drift": 0.00019597262144088745,
+      "anchor_rank": 108
+    }
+  ]
+}
