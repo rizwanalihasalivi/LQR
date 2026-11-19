@@ -43,7 +43,7 @@ class ErrorRollout:
             + self.data["H"][:, :, None] * ref[:, None, 3, :STEPS]
         ) / 25
 
-    def evaluate(self, parameters, derivatives=False):
+    def evaluate(self, parameters, derivatives=False, derivative_indices=None):
         w1, b1, w2, b2 = self.layers
         head = parameters[:65]
         fit_bias = len(parameters) > len(head)
@@ -59,9 +59,10 @@ class ErrorRollout:
         commands = np.zeros((STEPS, count))
         errors = np.zeros((STEPS + 1, count))
         errors[0] = state[:, 0]
-        state_gradient = np.zeros((count, 4, len(parameters))) if derivatives else None
-        command_gradient = np.zeros((STEPS, count, len(parameters))) if derivatives else None
-        error_gradient = np.zeros((STEPS + 1, count, len(parameters))) if derivatives else None
+        dimension = len(parameters) if derivative_indices is None else len(derivative_indices)
+        state_gradient = np.zeros((count, 4, dimension)) if derivatives else None
+        command_gradient = np.zeros((STEPS, count, dimension)) if derivatives else None
+        error_gradient = np.zeros((STEPS + 1, count, dimension)) if derivatives else None
 
         for tick in range(STEPS):
             offset = self.steps * (25 * state[:, 2, None])
@@ -96,6 +97,8 @@ class ErrorRollout:
                     gradient = np.column_stack((hidden, np.ones(count), bias_slope))
                 else:
                     gradient = np.column_stack((hidden, np.ones(count)))
+                if derivative_indices is not None:
+                    gradient = gradient[:, derivative_indices]
                 gradient += np.einsum("ni,nij->nj", raw_state, state_gradient)
                 gradient *= (self.gain[:, tick] * (np.abs(raw) < 1))[:, None]
                 gradient -= np.einsum("i,nij->nj", KR, state_gradient)
@@ -121,9 +124,10 @@ class ErrorRollout:
 
         rmse = np.sqrt((errors**2).mean(axis=0))
         return {
-            "mean_nominal": float(rmse[self.nominal].mean()),
+            "mean_nominal": float(rmse[self.nominal].mean()) if self.nominal.any() else None,
             "conditions": self.groups @ rmse / self.groups.sum(axis=1),
             "completed": int(active.sum()),
+            "completion_by_episode": active,
             "errors": errors,
             "gradient": error_gradient,
             "rmse": rmse,

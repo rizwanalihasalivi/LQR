@@ -15,39 +15,81 @@ SCALES = [(.91, .97), (1.14, 1.06)]
 CHECKPOINTS = (30, 120, 300)
 
 
-def collect(prior, teacher, seeds, scales):
-    nominal, labels, delayed = [], [], []
+def collect(prior, teacher, seeds, scales, prefix_focus=False, slalom_anchor=False):
+    nominal, labels, delayed, importance, critical = [], [], [], [], []
+    if prefix_focus:
+        from receding_nominal_targets import SteeringTeacher
     for case in build_cases(seeds, scales):
         env = make_env(case)
         obs, _ = env.reset(seed=case["seed"])
+        short_teacher = SteeringTeacher(env) if prefix_focus and case["delay"] == "none" else None
         for tick in range(1000):
             action = prior(obs)
             if tick < 80 or tick % 8 == 0:
                 if case["delay"] == "none":
                     nominal.append(obs)
-                    labels.append(np.clip(teacher(obs), -1., 1.))
+                    if short_teacher is None:
+                        label = teacher(obs)
+                    elif tick < 12:
+                        label = short_teacher.action(env, tick) + env.K @ env.x
+                    else:
+                        label = action
+                    labels.append(np.clip(label, -1., 1.))
+                    importance.append(12. if prefix_focus and tick < 3 else
+                                      4. if prefix_focus and tick < 12 else 1.)
                 elif tick > 0:
+                    if slalom_anchor and case["path"] == "slalom" and case["delay"] == "fixed200" and tick < 620:
+                        critical.append(len(delayed))
                     delayed.append(obs)
             obs, _, terminated, truncated, _ = env.step([action])
             if terminated or truncated:
                 break
+    if slalom_anchor:
+        for case in build_cases(range(23300, 23348), scales):
+            if case["delay"] != "none" or case["mass"] != 1650:
+                continue
+            env = make_env(case)
+            short_teacher = SteeringTeacher(env)
+            obs, _ = env.reset(seed=case["seed"])
+            for tick in range(8):
+                command = short_teacher.action(env, tick) + float(env.K @ env.x)
+                nominal.append(obs)
+                labels.append(np.clip(command, -1., 1.))
+                importance.append(12. if tick < 3 else 4.)
+                obs, _, terminated, _, _ = env.step([prior(obs)])
+                if terminated:
+                    break
     return (
         torch.tensor(np.stack(nominal)),
         torch.tensor(labels, dtype=torch.float32),
         torch.tensor(np.stack(delayed)),
+        torch.tensor(importance),
+        torch.tensor(critical, dtype=torch.long),
     )
 
 
-def train(seed, correct_anchor=False, refresh_anchors=False):
-    correct_anchor = correct_anchor or refresh_anchors
+def train(seed, correct_anchor=False, refresh_anchors=False, prefix_focus=False, slalom_anchor=False):
+    prefix_focus = prefix_focus or slalom_anchor
+    correct_anchor = correct_anchor or refresh_anchors or prefix_focus
     torch.set_num_threads(1)
     source = HERE / "guarded_round2" / "blend_.1" / f"policy_{seed}.zip"
     expert = HERE / "direct_fifo_nominal_polish" / f"policy_{seed}_48.zip"
     start = HERE / "anchor_corrected_transfer" / f"policy_{seed}_300.zip" if refresh_anchors else source
     seeds = [22592, 22593, 22594, 22595] if refresh_anchors else TRAIN_SEEDS
     scales = [(.88, 1.04), (1.13, .97)] if refresh_anchors else SCALES
+    if prefix_focus:
+        start = source = HERE / "gauss_newton_joint" / f"policy_{seed}_12.zip"
+        seeds = list(range(22724, 22730))
+        scales = [(.88, 1.03), (1.14, .96)]
+    if slalom_anchor:
+        start = source = HERE / "anchor_prefix_focus" / f"policy_{seed}_150.zip"
+        seeds = list(range(23348, 23356))
+        scales = [(.90, .96), (1.14, 1.08)]
     model = PPO.load(start, device="cpu")
-    nominal, target, delayed = collect(actor(model), actor(PPO.load(expert, device="cpu")), seeds, scales)
+    teacher = None if prefix_focus else actor(PPO.load(expert, device="cpu"))
+    nominal, target, delayed, importance, critical = collect(
+        actor(model), teacher, seeds, scales, prefix_focus, slalom_anchor
+    )
     network = torch.nn.Sequential(model.policy.mlp_extractor.policy_net, model.policy.action_net)
     named = dict(network.named_parameters())
     parameters = tuple(named.values())
@@ -59,6 +101,10 @@ def train(seed, correct_anchor=False, refresh_anchors=False):
     output = HERE / ("anchor_corrected_transfer" if correct_anchor else "anchor_projected_transfer")
     if refresh_anchors:
         output = HERE / "anchor_refreshed_transfer"
+    if prefix_focus:
+        output = HERE / "anchor_prefix_focus"
+    if slalom_anchor:
+        output = HERE / "anchor_prefix_slalom"
     output.mkdir(exist_ok=True)
     snapshots = []
     with torch.no_grad():
@@ -72,8 +118,15 @@ def train(seed, correct_anchor=False, refresh_anchors=False):
     checkpoints = (40, 120, 300) if correct_anchor else CHECKPOINTS
     if refresh_anchors:
         checkpoints = (120, 300, 900)
+    if prefix_focus:
+        checkpoints = (150, 450, 900)
+    if slalom_anchor:
+        checkpoints = (80, 230, 480)
     for step in range(1, checkpoints[-1] + 1):
         sample = torch.randint(len(delayed), (96,), generator=generator)
+        if slalom_anchor:
+            additional = critical[torch.randint(len(critical), (48,), generator=generator)]
+            sample = torch.cat((sample, additional))
         anchor = delayed[sample]
         jacobian = vmap(jacrev(steering), in_dims=(None, 0))(named, anchor)
         rows = torch.cat([matrix.reshape(len(anchor), -1) for matrix in jacobian.values()], dim=1).detach()
@@ -82,11 +135,14 @@ def train(seed, correct_anchor=False, refresh_anchors=False):
         basis = (vectors[:, keep].T @ rows) / values[keep].sqrt()[:, None]
 
         index = torch.randint(len(nominal), (512,), generator=generator)
+        if prefix_focus:
+            index = torch.multinomial(importance, 512, replacement=True, generator=generator)
         prediction = network(nominal[index]).squeeze(-1)
         loss = torch.nn.functional.smooth_l1_loss(prediction, target[index], beta=.015)
         gradient = torch.cat([g.flatten() for g in torch.autograd.grad(loss, parameters)])
         direction = gradient - basis.T @ (basis @ gradient)
-        direction = direction * (.001 / direction.norm().clamp_min(1e-12))
+        step_size = .00065 if slalom_anchor else .001
+        direction = direction * (step_size / direction.norm().clamp_min(1e-12))
         if correct_anchor:
             with torch.no_grad():
                 drift_from_source = network(anchor).squeeze(-1) - reference_output[sample]
@@ -108,8 +164,10 @@ def train(seed, correct_anchor=False, refresh_anchors=False):
     (output / f"training_{seed}.json").write_text(json.dumps({
         "source": str(start.relative_to(HERE)),
         "delayed_anchor": str(source.relative_to(HERE)),
-        "nominal_teacher": str(expert.relative_to(HERE)),
+        "nominal_teacher": "bounded receding targets" if prefix_focus else str(expert.relative_to(HERE)),
         "training_seeds": seeds,
+        "extra_nominal_reset_seeds": [23300, 23347] if slalom_anchor else None,
+        "fixed_slalom_anchor_samples": int(len(critical)),
         "corrects_cumulative_anchor_drift": correct_anchor,
         "scales": scales,
         "snapshots": snapshots,
@@ -121,5 +179,7 @@ if __name__ == "__main__":
     parser.add_argument("seed", type=int, choices=POLICY_SEEDS)
     parser.add_argument("--correct-anchor", action="store_true")
     parser.add_argument("--refresh-anchors", action="store_true")
+    parser.add_argument("--prefix-focus", action="store_true")
+    parser.add_argument("--slalom-anchor", action="store_true")
     args = parser.parse_args()
-    train(args.seed, args.correct_anchor, args.refresh_anchors)
+    train(args.seed, args.correct_anchor, args.refresh_anchors, args.prefix_focus, args.slalom_anchor)

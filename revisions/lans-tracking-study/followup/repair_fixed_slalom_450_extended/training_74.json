@@ -1,0 +1,53 @@
+{
+  "source": "repair_fixed_slalom_450_stress/policy_74_20.zip",
+  "training_seeds": [
+    22788,
+    22789,
+    22790,
+    22791,
+    22792,
+    22793,
+    22794,
+    22795
+  ],
+  "scales": [
+    [
+      0.89,
+      0.99
+    ],
+    [
+      1.12,
+      1.06
+    ]
+  ],
+  "additional_high_rate_slalom_cases": true,
+  "emphasizes_first_two_seconds": false,
+  "emphasizes_highest_slalom_rmse": true,
+  "baseline_slalom_rmse": 0.33857795514723255,
+  "snapshots": [
+    {
+      "step": 4,
+      "accepted": true,
+      "slalom_rmse": 0.2971699545528699,
+      "slalom_completed": 32,
+      "slalom_episodes": 32,
+      "completed": 144
+    },
+    {
+      "step": 10,
+      "accepted": false,
+      "slalom_rmse": 0.2971699545528699,
+      "slalom_completed": 32,
+      "slalom_episodes": 32,
+      "completed": 144
+    },
+    {
+      "step": 20,
+      "accepted": false,
+      "slalom_rmse": 0.2971699545528699,
+      "slalom_completed": 32,
+      "slalom_episodes": 32,
+      "completed": 144
+    }
+  ]
+}

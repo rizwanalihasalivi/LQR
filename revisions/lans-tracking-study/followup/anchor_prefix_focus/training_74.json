@@ -1,0 +1,44 @@
+{
+  "source": "gauss_newton_joint/policy_74_12.zip",
+  "delayed_anchor": "gauss_newton_joint/policy_74_12.zip",
+  "nominal_teacher": "bounded receding targets",
+  "training_seeds": [
+    22724,
+    22725,
+    22726,
+    22727,
+    22728,
+    22729
+  ],
+  "corrects_cumulative_anchor_drift": true,
+  "scales": [
+    [
+      0.88,
+      1.03
+    ],
+    [
+      1.14,
+      0.96
+    ]
+  ],
+  "snapshots": [
+    {
+      "step": 150,
+      "nominal_target_loss": 0.12471845746040344,
+      "max_local_anchor_drift": 0.00022710859775543213,
+      "anchor_rank": 82
+    },
+    {
+      "step": 450,
+      "nominal_target_loss": 0.14093513786792755,
+      "max_local_anchor_drift": 0.0002034902572631836,
+      "anchor_rank": 84
+    },
+    {
+      "step": 900,
+      "nominal_target_loss": 0.11628615856170654,
+      "max_local_anchor_drift": 0.0002763234078884125,
+      "anchor_rank": 81
+    }
+  ]
+}

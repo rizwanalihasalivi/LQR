@@ -1,0 +1,44 @@
+{
+  "source": "nominal_oracle_precision/policy_73_4000.zip",
+  "training_seeds": [
+    22716,
+    22717,
+    22718,
+    22719,
+    22720,
+    22721,
+    22722,
+    22723
+  ],
+  "scales": [
+    [
+      0.87,
+      1.01
+    ],
+    [
+      1.02,
+      0.95
+    ],
+    [
+      1.15,
+      1.08
+    ]
+  ],
+  "prediction_steps": 28,
+  "samples": 42048,
+  "fallback_solves": 45,
+  "snapshots": [
+    {
+      "update": 800,
+      "loss": 0.00968719832599163
+    },
+    {
+      "update": 2400,
+      "loss": 0.008942664600908756
+    },
+    {
+      "update": 5000,
+      "loss": 0.006840588059276342
+    }
+  ]
+}

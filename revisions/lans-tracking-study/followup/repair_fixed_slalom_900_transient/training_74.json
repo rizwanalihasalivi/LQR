@@ -1,0 +1,52 @@
+{
+  "source": "repair_fixed_slalom_900/policy_74_20.zip",
+  "training_seeds": [
+    22780,
+    22781,
+    22782,
+    22783,
+    22784,
+    22785,
+    22786,
+    22787
+  ],
+  "scales": [
+    [
+      0.89,
+      0.97
+    ],
+    [
+      1.1,
+      1.06
+    ]
+  ],
+  "additional_high_rate_slalom_cases": true,
+  "emphasizes_first_two_seconds": true,
+  "baseline_slalom_rmse": 0.4873868007426453,
+  "snapshots": [
+    {
+      "step": 4,
+      "accepted": true,
+      "slalom_rmse": 0.4919355199128035,
+      "slalom_completed": 26,
+      "slalom_episodes": 32,
+      "completed": 138
+    },
+    {
+      "step": 10,
+      "accepted": false,
+      "slalom_rmse": 0.48885199301126225,
+      "slalom_completed": 26,
+      "slalom_episodes": 32,
+      "completed": 138
+    },
+    {
+      "step": 20,
+      "accepted": true,
+      "slalom_rmse": 0.4843145036063081,
+      "slalom_completed": 26,
+      "slalom_episodes": 32,
+      "completed": 138
+    }
+  ]
+}

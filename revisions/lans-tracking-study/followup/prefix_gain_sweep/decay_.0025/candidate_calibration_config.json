@@ -1,0 +1,8 @@
+{
+  "beta_decay_per_ms": 0.0025,
+  "checkpoints": [
+    "followup/anchor_prefix_focus/policy_72_900.zip",
+    "followup/anchor_prefix_focus/policy_73_900.zip",
+    "followup/anchor_prefix_focus/policy_74_900.zip"
+  ]
+}

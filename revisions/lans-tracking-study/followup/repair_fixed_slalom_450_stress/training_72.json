@@ -1,0 +1,51 @@
+{
+  "source": "anchor_prefix_focus/policy_72_450.zip",
+  "training_seeds": [
+    22750,
+    22751,
+    22752,
+    22753,
+    22754,
+    22755,
+    22756,
+    22757
+  ],
+  "scales": [
+    [
+      0.88,
+      0.95
+    ],
+    [
+      1.11,
+      1.08
+    ]
+  ],
+  "additional_high_rate_slalom_cases": true,
+  "baseline_slalom_rmse": 0.26855701480119687,
+  "snapshots": [
+    {
+      "step": 4,
+      "accepted": false,
+      "slalom_rmse": 0.2606884823557748,
+      "slalom_completed": 32,
+      "slalom_episodes": 32,
+      "completed": 144
+    },
+    {
+      "step": 10,
+      "accepted": true,
+      "slalom_rmse": 0.24988045216096605,
+      "slalom_completed": 32,
+      "slalom_episodes": 32,
+      "completed": 144
+    },
+    {
+      "step": 20,
+      "accepted": true,
+      "slalom_rmse": 0.2071662297640447,
+      "slalom_completed": 32,
+      "slalom_episodes": 32,
+      "completed": 144
+    }
+  ]
+}
