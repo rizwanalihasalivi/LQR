@@ -1,0 +1,13 @@
+controller,speed_kmh,delay_ms,reset_second_layer_rows,steady_second_layer_rows
+LANS,90,0,5,5
+LANS,90,200,5,5
+LANS,90,1000,5,3
+LANS,150,0,5,5
+LANS,150,200,5,5
+LANS,150,1000,5,3
+PPO,90,0,64,64
+PPO,90,200,64,64
+PPO,90,1000,64,64
+PPO,150,0,64,64
+PPO,150,200,64,64
+PPO,150,1000,64,64

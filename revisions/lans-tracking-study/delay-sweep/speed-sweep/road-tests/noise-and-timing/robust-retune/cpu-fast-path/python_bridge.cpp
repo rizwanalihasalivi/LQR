@@ -10,6 +10,10 @@ struct BoundActor;
 double steer_lqr(const double* state, const double* gains);
 double steer_bound_actor(const BoundActor* context, const double* state, int tick,
                          double previous_delay, double mean_delay);
+#ifdef LANS_FIXED_DELAY_PLAN
+struct FixedActor;
+double steer_fixed_actor(const FixedActor* actor, const double* state, int tick);
+#endif
 }
 
 namespace {
@@ -82,9 +86,41 @@ PyObject* actor(PyObject*, PyObject* const* args, Py_ssize_t nargs) {
     return PyFloat_FromDouble(command);
 }
 
+#ifdef LANS_FIXED_DELAY_PLAN
+PyObject* fixed_actor(PyObject*, PyObject* const* args, Py_ssize_t nargs) {
+    if (nargs != 3) {
+        PyErr_SetString(PyExc_TypeError, "fixed_actor expects the fixed context, state and tick");
+        return nullptr;
+    }
+    const auto* context = static_cast<const FixedActor*>(PyCapsule_GetPointer(args[0], "lans.fixed"));
+    if (context == nullptr)
+        return nullptr;
+    const long tick = PyLong_AsLong(args[2]);
+    if (PyErr_Occurred())
+        return nullptr;
+    if (tick < 0 || tick > std::numeric_limits<int>::max()) {
+        PyErr_SetString(PyExc_ValueError, "tick is outside the bound road");
+        return nullptr;
+    }
+    const StateView state(args[1]);
+    const double* x = state.data();
+    if (x == nullptr)
+        return nullptr;
+    const double command = steer_fixed_actor(context, x, static_cast<int>(tick));
+    if (!std::isfinite(command)) {
+        PyErr_SetString(PyExc_ValueError, "controller inputs produced a non-finite command or exceeded the bound road");
+        return nullptr;
+    }
+    return PyFloat_FromDouble(command);
+}
+#endif
+
 PyMethodDef methods[] = {
     {"lqr", reinterpret_cast<PyCFunction>(lqr), METH_FASTCALL, "Apply the bound LQR gain."},
     {"actor", reinterpret_cast<PyCFunction>(actor), METH_FASTCALL, "Apply a bound neural controller."},
+#ifdef LANS_FIXED_DELAY_PLAN
+    {"fixed_actor", reinterpret_cast<PyCFunction>(fixed_actor), METH_FASTCALL, "Apply a fixed-delay neural controller."},
+#endif
     {nullptr, nullptr, 0, nullptr}
 };
 

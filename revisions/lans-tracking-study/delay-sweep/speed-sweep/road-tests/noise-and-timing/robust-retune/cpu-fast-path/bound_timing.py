@@ -69,7 +69,7 @@ class BoundControllers(NativeControllers):
         return command
 
 
-def run_benchmark(controllers, repeats, compiler):
+def run_benchmark(controllers, repeats, compiler, output=HERE):
     cells = tuple(product(SPEEDS, DELAYS, ROADS))
     differences = defaultdict(float)
     counts = defaultdict(int)
@@ -129,13 +129,13 @@ def run_benchmark(controllers, repeats, compiler):
 
     summary = [timing.stats(label, values) for label, values in groups.items()]
     summary.sort(key=lambda row: (row["controller"] not in sweep.CONTROLLERS, row["median_us"]))
-    write(HERE / "timing_summary.csv", summary)
-    write(HERE / "timing_by_repeat.csv", by_repeat)
+    write(output / "timing_summary.csv", summary)
+    write(output / "timing_by_repeat.csv", by_repeat)
     cpu = next(line.split(":", 1)[1].strip() for line in Path("/proc/cpuinfo").read_text().splitlines()
                if line.startswith("model name"))
     metadata = dict(cpu=cpu, logical_cpu=min(os.sched_getaffinity(0)), compiler=compiler,
                     variant="moderate", max_steering_delta_rad=dict(differences), clean_parity_calls=dict(counts), noisy_parity_calls=dict(noise_counts))
-    (HERE / "host.json").write_text(json.dumps(metadata, indent=2) + "\n")
+    (output / "host.json").write_text(json.dumps(metadata, indent=2) + "\n")
 
 
 def main():

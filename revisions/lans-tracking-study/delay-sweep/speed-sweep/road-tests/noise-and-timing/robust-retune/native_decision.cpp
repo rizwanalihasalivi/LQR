@@ -25,6 +25,10 @@ public:
         std::copy_n(b, bias.size(), bias.begin());
     }
 
+    float weight(int row, int column) const { return weights[row * In + column]; }
+    float offset(int row) const { return bias[row]; }
+    Sgemm gemm() const { return multiply; }
+
     void apply(const std::array<float, In>& x, std::array<float, Out>& y, bool relu) const {
         const int one = 1, in = In, out = Out;
         const float unit = 1.f;
@@ -71,18 +75,26 @@ public:
         }
     }
 
+    float weight(int row, int column) const { return dense.weight(row, column); }
+    float offset(int row) const { return dense.offset(row); }
+
+    bool can_use_sparse_rows() const { return compatible; }
+
+    float activation(const std::array<float, Inputs>& x, int i) const {
+        const auto& row = sparse[i];
+        float sum = 0.f;
+        for (int j = 0; j < row.length; ++j)
+            sum = std::fma(row.weights[j], x[row.columns[j]], sum);
+        return std::max(sum + bias[i], 0.f);
+    }
+
     void apply(const std::array<float, Inputs>& x, std::array<float, Width>& y, bool relu) const {
         if (!compatible) {
             dense.apply(x, y, relu);
             return;
         }
-        for (int i = 0; i < Width; ++i) {
-            const auto& row = sparse[i];
-            float sum = 0.f;
-            for (int j = 0; j < row.length; ++j)
-                sum = std::fma(row.weights[j], x[row.columns[j]], sum);
-            y[i] = std::max(sum + bias[i], 0.f);
-        }
+        for (int i = 0; i < Width; ++i)
+            y[i] = activation(x, i);
     }
 };
 
@@ -191,3 +203,7 @@ double steer_bound_actor(const BoundActor* context, const double* state, int tic
     return steer(*context->actor, obs, base, context->residual_scale, context->gain);
 }
 }
+
+#ifdef LANS_FIXED_DELAY_PLAN
+#include "cpu-fast-path/fixed-delay/activation_plan.hpp"
+#endif
