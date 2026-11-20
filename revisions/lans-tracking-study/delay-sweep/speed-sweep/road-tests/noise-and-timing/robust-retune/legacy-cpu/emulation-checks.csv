@@ -1,0 +1,9 @@
+emulated_profile,controller,decisions,max_reference_error_rad
+Conroe-v1,LQR,18836,2.77555756156e-17
+Conroe-v1,LANS,18836,0.00146484375
+Conroe-v1,MPC,18836,1.98762226745e-05
+Conroe-v1,PPO,18836,1.05798244476e-06
+IvyBridge-v1,LQR,18836,2.77555756156e-17
+IvyBridge-v1,LANS,18836,0.00146484375
+IvyBridge-v1,MPC,18836,1.98762226745e-05
+IvyBridge-v1,PPO,18836,1.05798244476e-06
