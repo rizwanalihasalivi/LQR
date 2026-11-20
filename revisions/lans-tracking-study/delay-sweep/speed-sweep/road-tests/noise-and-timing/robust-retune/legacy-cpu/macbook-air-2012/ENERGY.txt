@@ -1,0 +1,17 @@
+LANS energy capture for Intel macOS
+
+1. Extract this ZIP and double-click Run-Energy.command.
+2. Authorize the built-in powermetrics utility to read package power.
+3. Leave the Terminal open until all five phases finish, about six minutes.
+4. Share the generated energy-capture folder (you can compress it to a ZIP).
+
+Each active phase executes a single controller on the shared tape, and the
+idle phase records a baseline. The bundle saves the measured workload window
+and decision count, plus raw macOS package-power samples. These can be used to
+estimate joules per decision from the full workload interval. macOS labels
+the reported power source. If the device reports model-derived power, the
+result is an OS-derived estimate. CPU-package results cover the package.
+
+If the utility cannot report CPU package power, the saved error file will
+show the reason. The same workload executable can also be used with an
+external energy meter.

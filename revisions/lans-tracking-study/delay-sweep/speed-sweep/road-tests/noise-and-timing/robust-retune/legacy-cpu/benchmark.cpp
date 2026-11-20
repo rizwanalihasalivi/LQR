@@ -11,6 +11,7 @@
 #include <memory>
 #include <numeric>
 #include <stdexcept>
+#include <thread>
 #include <vector>
 #if defined(_WIN32)
 #define WIN32_LEAN_AND_MEAN
@@ -33,6 +34,8 @@ namespace {
 constexpr int Horizon = 20;
 constexpr int Extended = 4 * Horizon;
 constexpr int Controllers = 4;
+constexpr std::array<double, Controllers> ReferenceLimits{.003, 1e-5, 1e-12, 3e-5};
+constexpr std::array<const char*, Controllers> ControllerNames{"LANS", "PPO", "LQR", "MPC"};
 using State = std::array<double, 4>;
 
 class Reader {
@@ -235,38 +238,50 @@ void pin_cpu() {
 #endif
 }
 
+class PreparedCase {
+    const Case& data;
+    BoundActor hybrid, neural;
+    FixedActor fixed_lans, fixed_ppo;
+    Mpc mpc;
+
+public:
+    PreparedCase(const Case& c, const Actor* lans, const Actor* ppo, const double* transform,
+                 const MatchedPlant& plant)
+        : data(c),
+          hybrid{lans, c.gains.data(), c.road.data(), transform, int(c.stride), 1,
+                 c.speed / 3.6, c.lans_scale, std::exp(-c.decay * std::max(0., double(c.delay) - 5.))},
+          neural{ppo, c.gains.data(), c.road.data(), transform, int(c.stride), 0,
+                 c.speed / 3.6, c.ppo_scale, 1.},
+          fixed_lans(hybrid, c.delay), fixed_ppo(neural, c.delay), mpc(plant) {}
+
+    void reset() { mpc.reset(); }
+
+    double decide(int slot, unsigned tick) {
+        const Frame& frame = data.frames[tick];
+        switch (slot) {
+        case 0: return fixed_command(fixed_lans, frame.state.data(), tick);
+        case 1: return fixed_command(fixed_ppo, frame.state.data(), tick);
+        case 2: return steer_lqr(frame.state.data(), data.lqr.data());
+        default: return mpc.decide(frame.state, frame.previous, data.road.data(), data.stride, tick);
+        }
+    }
+};
+
 void run_case(const Case& c, const Actor* lans, const Actor* ppo, const double* transform,
               const MatchedPlant& plant, int repeats, std::array<std::vector<double>, Controllers>& times,
               std::array<double, Controllers>& error) {
-    const int stride = c.stride;
-    const double speed = c.speed / 3.6;
-    const double gain = std::exp(-c.decay * std::max(0., double(c.delay) - 5.));
-    const BoundActor hybrid{lans, c.gains.data(), c.road.data(), transform, stride, 1,
-                            speed, c.lans_scale, gain};
-    const BoundActor neural{ppo, c.gains.data(), c.road.data(), transform, stride, 0,
-                            speed, c.ppo_scale, 1.};
-    const FixedActor fixed_lans(hybrid, c.delay), fixed_ppo(neural, c.delay);
-    Mpc mpc(plant);
-    const auto decide = [&](int slot, unsigned tick) {
-        const Frame& f = c.frames[tick];
-        switch (slot) {
-        case 0: return fixed_command(fixed_lans, f.state.data(), tick);
-        case 1: return fixed_command(fixed_ppo, f.state.data(), tick);
-        case 2: return steer_lqr(f.state.data(), c.lqr.data());
-        default: return mpc.decide(f.state, f.previous, c.road.data(), stride, tick);
-        }
-    };
+    PreparedCase workload(c, lans, ppo, transform, plant);
 
     for (int i = 0; i < 40; ++i)
         for (int slot = 0; slot < Controllers; ++slot)
-            decide(slot, 0);
+            workload.decide(slot, 0);
     for (int repeat = 0; repeat < repeats; ++repeat) {
-        mpc.reset();
+        workload.reset();
         for (unsigned tick = 0; tick < c.ticks; ++tick) {
             for (int i = 0; i < Controllers; ++i) {
                 const int slot = (i + tick) % Controllers;
                 const auto begin = std::chrono::steady_clock::now();
-                const double command = decide(slot, tick);
+                const double command = workload.decide(slot, tick);
                 const auto end = std::chrono::steady_clock::now();
                 if (!std::isfinite(command))
                     throw std::runtime_error("invalid steering command");
@@ -276,17 +291,145 @@ void run_case(const Case& c, const Actor* lans, const Actor* ppo, const double* 
         }
     }
 }
+
+class EnergyCounter {
+    std::string file;
+    std::uint64_t modulus = 0, last = 0, accumulated = 0;
+
+    static std::uint64_t read(const std::string& path) {
+        std::uint64_t value;
+        if (!(std::ifstream(path) >> value))
+            throw std::runtime_error("cannot read hardware energy counter: " + path);
+        return value;
+    }
+
+public:
+    explicit EnergyCounter(const char* path) : file(path ? path : "") {
+        if (enabled()) {
+            const auto slash = file.rfind('/');
+            const auto directory = slash == std::string::npos ? "" : file.substr(0, slash + 1);
+            std::string domain;
+            if (!(std::ifstream(directory + "name") >> domain) || domain.rfind("package-", 0) != 0)
+                throw std::runtime_error("select a package energy counter, not a core or other subdomain");
+            modulus = read(directory + "max_energy_range_uj");
+            if (!modulus)
+                throw std::runtime_error("hardware energy range must be positive");
+        }
+    }
+
+    bool enabled() const { return !file.empty(); }
+
+    void begin() {
+        if (enabled())
+            last = read(file);
+    }
+
+    void sample() {
+        if (!enabled())
+            return;
+        const auto current = read(file);
+        if (current >= modulus || last >= modulus)
+            throw std::runtime_error("hardware energy reading is outside the counter range");
+        accumulated += current >= last ? current - last : modulus - last + current;
+        last = current;
+    }
+
+    double joules() const { return accumulated / 1.e6; }
+};
+
+void run_workload(const char* name, double seconds, const char* counter, Reader& tape,
+                  const Actor* lans, const Actor* ppo, const double* transform,
+                  const MatchedPlant& slow, const MatchedPlant& fast) {
+    const auto selected = std::find(ControllerNames.begin(), ControllerNames.end(), std::string(name));
+    const bool idle = std::string(name) == "IDLE";
+    if (!idle && selected == ControllerNames.end())
+        throw std::runtime_error("workload controller must be LANS, PPO, LQR, MPC or IDLE");
+    if (!std::isfinite(seconds) || seconds < .1 || seconds > 3600.)
+        throw std::runtime_error("workload duration must be between 0.1 and 3600 seconds");
+    const int slot = selected - ControllerNames.begin();
+    std::vector<Case> cases;
+    cases.reserve(24);
+    for (int i = 0; i < 24; ++i)
+        cases.emplace_back(tape);
+    tape.finish();
+    std::vector<std::unique_ptr<PreparedCase>> workloads;
+    for (const auto& c : cases)
+        workloads.push_back(std::make_unique<PreparedCase>(c, lans, ppo, transform, c.speed == 90 ? slow : fast));
+
+    // Check the full shared tape and warm up the selected path before measuring.
+    if (!idle) {
+        for (std::size_t i = 0; i < workloads.size(); ++i) {
+            if (slot == 3)
+                workloads[i]->reset();
+            for (unsigned tick = 0; tick < cases[i].ticks; ++tick) {
+                const double u = workloads[i]->decide(slot, tick);
+                if (!std::isfinite(u) || std::abs(u - cases[i].frames[tick].expected[slot]) > ReferenceLimits[slot])
+                    throw std::runtime_error("energy workload reference steering check failed");
+            }
+        }
+    }
+
+    EnergyCounter energy(counter);
+    using Clock = std::chrono::steady_clock;
+    using Duration = std::chrono::duration<double>;
+    const auto unix_ns = [] {
+        return std::chrono::duration_cast<std::chrono::nanoseconds>(
+            std::chrono::system_clock::now().time_since_epoch()).count();
+    };
+    double checksum = 0.;
+    std::uint64_t decisions = 0;
+    energy.begin();
+    const auto start_unix = unix_ns();
+    const auto start = Clock::now();
+    const auto deadline = start + Duration(seconds);
+    auto next_read = start + std::chrono::seconds(1);
+    const auto read_if_due = [&] {
+        if (energy.enabled() && Clock::now() >= next_read) {
+            energy.sample();
+            next_read = Clock::now() + std::chrono::seconds(1);
+        }
+    };
+    if (idle) {
+        while (Clock::now() < deadline) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            read_if_due();
+        }
+    } else {
+        do {
+            for (std::size_t i = 0; i < workloads.size(); ++i) {
+                if (slot == 3)
+                    workloads[i]->reset();
+                for (unsigned tick = 0; tick < cases[i].ticks; ++tick)
+                    checksum += workloads[i]->decide(slot, tick);
+                decisions += cases[i].ticks;
+                read_if_due();
+            }
+        } while (Clock::now() < deadline);
+    }
+    const double elapsed = Duration(Clock::now() - start).count();
+    const auto end_unix = unix_ns();
+    energy.sample();
+    std::cout << "controller,decisions,elapsed_s,start_unix_ns,end_unix_ns,package_energy_j,checksum\n"
+              << name << ',' << decisions << ',' << std::setprecision(12) << elapsed << ','
+              << start_unix << ',' << end_unix << ',';
+    if (energy.enabled())
+        std::cout << energy.joules();
+    std::cout << ',' << checksum << '\n';
+}
+
 }
 
 int main(int argc, char** argv) {
     try {
-        if (argc < 2 || argc > 3)
-            throw std::runtime_error("usage: legacy-timing TAPE [REPEATS]");
-        const int repeats = argc == 3 ? std::stoi(argv[2]) : 3;
+        const bool workload_mode = argc > 1 && std::string(argv[1]) == "--workload";
+        if ((!workload_mode && (argc < 2 || argc > 3)) ||
+            (workload_mode && (argc < 5 || argc > 6)))
+            throw std::runtime_error("usage: legacy-timing TAPE [REPEATS] or --workload TAPE CONTROLLER SECONDS [ENERGY_UJ]");
+        const int repeats = !workload_mode && argc == 3 ? std::stoi(argv[2]) : 3;
         if (repeats < 1 || repeats > 100)
             throw std::runtime_error("repeat count must be between 1 and 100");
         pin_cpu();
-        Reader tape(argv[1]);
+        Reader tape(argv[workload_mode ? 2 : 1]);
         if (tape.read<std::uint32_t>() != 2 || tape.read<std::uint32_t>() != 24)
             throw std::runtime_error("unsupported legacy workload");
         const auto lans = load_actor(tape);
@@ -295,6 +438,11 @@ int main(int argc, char** argv) {
         const MatchedPlant slow(tape), fast(tape);
         if (slow.speed != 90 || fast.speed != 150)
             throw std::runtime_error("unexpected MPC model speeds");
+        if (workload_mode) {
+            run_workload(argv[3], std::stod(argv[4]), argc == 6 ? argv[5] : nullptr,
+                         tape, lans.get(), ppo.get(), transform.data(), slow, fast);
+            return 0;
+        }
         std::array<std::vector<double>, Controllers> times;
         std::array<double, Controllers> error{};
         for (int i = 0; i < 24; ++i) {
@@ -304,11 +452,9 @@ int main(int argc, char** argv) {
         tape.finish();
         // Float32 accumulation order can differ on the scalar backend. The
         // reference limit is checked over every timed state and reported.
-        const std::array<double, Controllers> limit{.003, 1e-5, 1e-12, 3e-5};
-        const std::array<const char*, Controllers> names{"LANS", "PPO", "LQR", "MPC"};
         for (int i = 0; i < Controllers; ++i) {
-            if (error[i] > limit[i]) {
-                std::cerr << names[i] << " max reference steering difference " << error[i] << " rad\n";
+            if (error[i] > ReferenceLimits[i]) {
+                std::cerr << ControllerNames[i] << " max reference steering difference " << error[i] << " rad\n";
                 throw std::runtime_error("reference steering difference exceeded the limit");
             }
             std::sort(times[i].begin(), times[i].end());
@@ -326,7 +472,7 @@ int main(int argc, char** argv) {
         for (int i = 0; i < Controllers; ++i) {
             const int slot = rank[i];
             const auto& t = times[slot];
-            std::cout << i + 1 << ',' << names[slot] << ',' << t.size() << ',' << std::setprecision(12)
+            std::cout << i + 1 << ',' << ControllerNames[slot] << ',' << t.size() << ',' << std::setprecision(12)
                       << percentile(t, .5) << ',' << percentile(t, .95) << ','
                       << std::accumulate(t.begin(), t.end(), 0.) / t.size() << ',' << error[slot] << '\n';
         }
