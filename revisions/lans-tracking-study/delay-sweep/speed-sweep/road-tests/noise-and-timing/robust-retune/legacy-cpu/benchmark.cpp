@@ -12,7 +12,14 @@
 #include <numeric>
 #include <stdexcept>
 #include <vector>
-#ifdef __linux__
+#if defined(_WIN32)
+#define WIN32_LEAN_AND_MEAN
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#include <cpuid.h>
+#elif defined(__linux__)
 #include <sched.h>
 #endif
 
@@ -187,7 +194,29 @@ struct Case {
 };
 
 void pin_cpu() {
-#ifdef __linux__
+#if defined(_WIN32)
+    if (__get_cpuid_max(0x80000000U, nullptr) >= 0x80000004U) {
+        std::array<char, 49> brand{};
+        for (unsigned i = 0; i < 3; ++i) {
+            std::array<unsigned, 4> registers{};
+            __cpuid(0x80000002U + i, registers[0], registers[1], registers[2], registers[3]);
+            std::memcpy(brand.data() + 16 * i, registers.data(), 16);
+        }
+        std::cerr << "Processor: " << brand.data() << '\n';
+    }
+    DWORD_PTR allowed = 0, system = 0;
+    if (!GetProcessAffinityMask(GetCurrentProcess(), &allowed, &system) || !allowed)
+        throw std::runtime_error("could not read Windows CPU affinity");
+    DWORD_PTR bit = 1;
+    unsigned cpu = 0;
+    while (!(allowed & bit)) {
+        bit <<= 1;
+        ++cpu;
+    }
+    if (!SetThreadAffinityMask(GetCurrentThread(), bit))
+        throw std::runtime_error("could not pin the benchmark thread");
+    std::cerr << "Pinned Windows logical CPU " << cpu << '\n';
+#elif defined(__linux__)
     cpu_set_t allowed;
     if (sched_getaffinity(0, sizeof(allowed), &allowed))
         throw std::runtime_error("could not read CPU affinity");

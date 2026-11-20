@@ -1,0 +1,11 @@
+The benchmark uses OSQP under Apache License 2.0 (see OSQP-LICENSE).
+
+The supplied Windows executable links GCC runtime libraries and MinGW-w64
+runtime components. GCC runtime libraries are covered by GPLv3 with the
+GCC Runtime Library Exception 3.1, which permits distributing qualifying
+executables under their own terms.
+
+GCC Runtime Library Exception: https://www.gnu.org/licenses/gcc-exception-3.1.html
+GNU GPL version 3: https://www.gnu.org/licenses/gpl-3.0.html
+GCC and runtime sources: https://deb.debian.org/debian/pool/main/g/gcc-mingw-w64/
+MinGW-w64 sources and notices: https://deb.debian.org/debian/pool/main/m/mingw-w64/
