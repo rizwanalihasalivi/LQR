@@ -1,0 +1,7 @@
+The benchmark includes OSQP under Apache License 2.0 (see OSQP-LICENSE).
+The executable is built with Zig and LLVM tooling. The bundled LLVM
+runtime notices are in LLVM-RUNTIME-LICENSES.txt.
+
+Zig license and source: https://github.com/ziglang/zig
+LLVM license and source: https://github.com/llvm/llvm-project
+LLVM license text: https://llvm.org/LICENSE.txt
