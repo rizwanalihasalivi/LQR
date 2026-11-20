@@ -1,0 +1,21 @@
+{
+  "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+  "logical_cpu": 0,
+  "compiler": "g++ (Debian 14.2.0-19) 14.2.0",
+  "variant": "moderate",
+  "max_steering_delta_rad": {
+    "lans": 5.551115123125783e-17,
+    "ppo": 5.960464477539063e-08,
+    "lqr": 2.7755575615628914e-17
+  },
+  "clean_parity_calls": {
+    "lans": 19796,
+    "ppo": 19796,
+    "lqr": 19796
+  },
+  "noisy_parity_calls": {
+    "lans": 2474,
+    "ppo": 2474,
+    "lqr": 2474
+  }
+}

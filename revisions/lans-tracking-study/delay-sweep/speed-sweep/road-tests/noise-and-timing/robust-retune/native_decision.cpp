@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <limits>
 
 namespace {
 constexpr int Width = 64;
@@ -36,8 +37,62 @@ public:
     }
 };
 
+#ifdef LANS_PACK_FIRST_LAYER
+// The same compressed layout is used for any first layer with at most four
+// nonzero entries per output. Denser layers use the original SGEMM path.
+class FirstLayer {
+    struct Row {
+        std::array<float, 4> weights{};
+        std::array<int, 4> columns{};
+        int length = 0;
+    };
+    Layer<Inputs, Width> dense;
+    std::array<Row, Width> sparse;
+    std::array<float, Width> bias;
+    bool compatible = true;
+
+public:
+    FirstLayer(const float* weights, const float* biases, Sgemm gemm) : dense(weights, biases, gemm) {
+        std::copy_n(biases, Width, bias.begin());
+        for (int i = 0; i < Width; ++i) {
+            auto& row = sparse[i];
+            for (int j = 0; j < Inputs; ++j) {
+                const float w = weights[i * Inputs + j];
+                if (w == 0.f)
+                    continue;
+                if (row.length == 4) {
+                    compatible = false;
+                    return;
+                }
+                row.weights[row.length] = w;
+                row.columns[row.length] = j;
+                ++row.length;
+            }
+        }
+    }
+
+    void apply(const std::array<float, Inputs>& x, std::array<float, Width>& y, bool relu) const {
+        if (!compatible) {
+            dense.apply(x, y, relu);
+            return;
+        }
+        for (int i = 0; i < Width; ++i) {
+            const auto& row = sparse[i];
+            float sum = 0.f;
+            for (int j = 0; j < row.length; ++j)
+                sum = std::fma(row.weights[j], x[row.columns[j]], sum);
+            y[i] = std::max(sum + bias[i], 0.f);
+        }
+    }
+};
+
+using ActorInputLayer = FirstLayer;
+#else
+using ActorInputLayer = Layer<Inputs, Width>;
+#endif
+
 struct Actor {
-    Layer<Inputs, Width> first;
+    ActorInputLayer first;
     Layer<Width, Width> second;
     Layer<Width, 1> action;
 };
@@ -76,6 +131,17 @@ std::array<float, Inputs> observe(const double* state, const double* reference,
     obs[10] = mean_delay / 200.;
     return obs;
 }
+
+double steer(const Actor& actor, const std::array<float, Inputs>& obs, double base,
+             double residual_scale, double gain) {
+    std::array<float, Width> hidden, features;
+    std::array<float, 1> action;
+    actor.first.apply(obs, hidden, true);
+    actor.second.apply(hidden, features, true);
+    actor.action.apply(features, action, false);
+    const double residual = residual_scale * std::clamp(action[0], -1.f, 1.f);
+    return std::clamp(base + gain * residual, -.5, .5);
+}
 }
 
 extern "C" {
@@ -97,14 +163,31 @@ double steer_actor(const Actor* actor, const double* state, const double* gains,
                    double speed, double previous_delay, double mean_delay,
                    double residual_scale, double decay, double delay, int hybrid) {
     const auto obs = observe(state, reference, stride, tick, speed, previous_delay, mean_delay, transform);
-    std::array<float, Width> hidden, features;
-    std::array<float, 1> action;
-    actor->first.apply(obs, hidden, true);
-    actor->second.apply(hidden, features, true);
-    actor->action.apply(features, action, false);
     const double base = hybrid ? lqr_command(state, gains) : 0.;
     const double gain = hybrid ? std::exp(-decay * std::max(0., delay - 5.)) : 1.;
-    const double residual = residual_scale * std::clamp(action[0], -1.f, 1.f);
-    return std::clamp(base + gain * residual, -.5, .5);
+    return steer(*actor, obs, base, residual_scale, gain);
+}
+
+// Borrowed buffers and actor are owned by the caller for the scenario lifetime.
+struct BoundActor {
+    const Actor* actor;
+    const double* gains;
+    const double* reference;
+    const double* transform;
+    int stride;
+    int hybrid;
+    double speed;
+    double residual_scale;
+    double gain;
+};
+
+double steer_bound_actor(const BoundActor* context, const double* state, int tick,
+                         double previous_delay, double mean_delay) {
+    if (tick < 0 || tick >= context->stride - 4)
+        return std::numeric_limits<double>::quiet_NaN();
+    const auto obs = observe(state, context->reference, context->stride, tick, context->speed,
+                             previous_delay, mean_delay, context->transform);
+    const double base = context->hybrid ? lqr_command(state, context->gains) : 0.;
+    return steer(*context->actor, obs, base, context->residual_scale, context->gain);
 }
 }

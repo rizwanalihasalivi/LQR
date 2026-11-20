@@ -26,7 +26,8 @@ def decide(env, model, mpc, delay):
     return env.compose(action, delay)[0]
 
 
-def scenario(speed, delay, path):
+def scenario(speed, delay, path, *, bind=None):
+    """Replay common states and prepare optional decision callables before timing."""
     policy_seed = sweep.TRAIN_SEEDS[0]
     seed = FRESH_SEEDS[0]
     amplitude, scale = sweep.sweep.P["test"]["scales"][0]
@@ -54,17 +55,22 @@ def scenario(speed, delay, path):
          mpc if controller == "MPC" else None)
         for controller in sweep.CONTROLLERS
     ]
+    bound = [bind(env, model, optimizer, delay) for _, env, model, optimizer in participants] if bind else None
     # Warm the Python/Torch paths before taking measurements. The MPC warm start
     # used for timing starts again from the scenario's normal zero initialization.
     for _ in range(40):
-        for _, env, model, optimizer in participants:
-            decide(env, model, optimizer, delay)
+        for index, (_, env, model, optimizer) in enumerate(participants):
+            if bound is None:
+                decide(env, model, optimizer, delay)
+            else:
+                bound[index]()
     mpc.last.fill(0.)
     mpc.solver.warm_start(x=np.zeros(mpc.N), y=np.zeros(mpc.N))
     mpc.failures = 0
     for tick in range(horizon):
         offset = tick % len(participants)
-        for controller, env, model, optimizer in participants[offset:] + participants[:offset]:
+        for index in (*range(offset, len(participants)), *range(offset)):
+            controller, env, model, optimizer = participants[index]
             env.x = reference.x
             env.k = reference.k
             env.prev_u = reference.prev_u
@@ -73,9 +79,15 @@ def scenario(speed, delay, path):
                 env.history = reference.history
             before = calls
             failures = mpc.failures
-            start = perf_counter_ns()
-            decide(env, model, optimizer, delay)
-            elapsed = perf_counter_ns() - start
+            if bound is None:
+                start = perf_counter_ns()
+                decide(env, model, optimizer, delay)
+                elapsed = perf_counter_ns() - start
+            else:
+                command = bound[index]
+                start = perf_counter_ns()
+                command()
+                elapsed = perf_counter_ns() - start
             yield dict(speed_kmh=speed, delay_ms=delay, path=path, tick=tick, controller=controller,
                        decision_ns=elapsed, qp_solved=int(calls > before),
                        fallback=int(mpc.failures > failures))
