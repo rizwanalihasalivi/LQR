@@ -6,14 +6,15 @@ import csv
 import sys
 
 import torch
+from stable_baselines3 import PPO
 
 from candidate import CandidateEnv, ORIGINAL_ENV, TARGET, TRAIN_SEEDS, sweep
 
 HERE = Path(__file__).resolve().parent
+DIRECT_TRIAL = HERE.parent / 'zero-delay-diagnosis' / 'direct-trial'
 
 def run(job):
     label = job[1]
-    kind = job[2]
     sweep.NetworkEnv = CandidateEnv if label == 'LANS' else ORIGINAL_ENV
     return sweep.run(job)
 
@@ -25,10 +26,11 @@ if __name__ == '__main__':
     sweep.OUT = HERE
     mode = sys.argv[1] if len(sys.argv) > 1 else 'all'
     for seed in TRAIN_SEEDS:
-        baseline = sweep.load('limited_ppo',seed)
-        sweep.POLICIES['limited_ppo',seed] = baseline
+        sweep.POLICIES['limited_ppo', seed] = sweep.load('limited_ppo', seed)
         if mode != 'baselines':
-            sweep.POLICIES['limited_lans',seed] = type(baseline).load(HERE/f'ppo_{seed}.zip',device='cpu')
+            sweep.POLICIES['limited_lans', seed] = PPO.load(
+                DIRECT_TRIAL / f'ppo_{seed}.zip', device='cpu'
+            )
     configs = [('LQR','lqr',None,-1),('MPC','mpc',None,-1)]
     configs.extend((label,kind,name,seed) for (label,kind,name),seed in itertools.product(
         [('LANS','lans','limited_lans'),('PPO','ppo','limited_ppo')],TRAIN_SEEDS))
